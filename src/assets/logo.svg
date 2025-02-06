@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="200" height="50" viewBox="0 0 200 50" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Globe Icon -->
+  <circle cx="25" cy="25" r="20" stroke="#1D3557" stroke-width="2" fill="none"/>
+  <path d="M25 5C31.6274 5 37 10.3726 37 17" stroke="#E63946" stroke-width="2"/>
+  <path d="M5 25h40" stroke="#1D3557" stroke-width="2"/>
+  <path d="M25 5v40" stroke="#1D3557" stroke-width="2"/>
+  
+  <!-- Text -->
+  <text x="55" y="30" font-family="Arial" font-weight="bold" font-size="20" fill="#1D3557">
+    Global Grants
+  </text>
+  <text x="55" y="45" font-family="Arial" font-size="12" fill="#E63946">
+    Hub
+  </text>
+</svg>

@@ -1,13 +1,18 @@
 :root {
   /* Color variables */
-  --primary: #2563eb;
-  --primary-dark: #1d4ed8;
-  --secondary: #64748b;
-  --background: #ffffff;
-  --text: #1e293b;
-  --text-light: #64748b;
-  --error: #ef4444;
-  --success: #22c55e;
+  --primary: #E63946;
+  --primary-dark: #A4161A;
+  --secondary: #1D3557;
+  --soft-peach: #F8E1DC;
+  --dark-crimson: #A4161A;
+  --background: #FFFFFF;
+  --background-alt: #F0F0F0;
+  --text-primary: #1D3557;
+  --text-secondary: #4F4F4F;
+  --text-light: #757575;
+  
+  /* Gradients */
+  --gradient-primary: linear-gradient(135deg, #E63946 0%, #1D3557 100%);
 }
 
 * {
@@ -22,7 +27,7 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  color: var(--text);
+  color: var(--text-primary);
   background-color: var(--background);
   line-height: 1.5;
 }
@@ -30,15 +35,18 @@ body {
 h1, h2, h3, h4, h5, h6 {
   font-weight: 600;
   line-height: 1.2;
+  color: var(--secondary);
 }
 
 a {
   color: var(--primary);
   text-decoration: none;
+  transition: color 0.2s ease;
 }
 
 a:hover {
-  text-decoration: underline;
+  color: var(--primary-dark);
+  text-decoration: none;
 }
 
 button {
