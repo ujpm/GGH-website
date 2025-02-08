@@ -91,7 +91,7 @@ const ServicesOverview = () => {
   return (
     <Section>
       <Container>
-        <SectionTitle>What We Do</SectionTitle>
+        <SectionTitle>GGH-What We Do?</SectionTitle>
         <SectionSubtitle>
           We provide comprehensive support to help you secure funding and implement successful projects.
         </SectionSubtitle>

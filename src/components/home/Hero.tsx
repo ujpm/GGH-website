@@ -57,7 +57,7 @@ const Hero = () => {
         <ButtonGroup>
           <Link to="/services">
             <StyledButton variant="primary" size="large">
-              Explore Opportunities
+              Explore Grants
             </StyledButton>
           </Link>
           <Link to="/about">

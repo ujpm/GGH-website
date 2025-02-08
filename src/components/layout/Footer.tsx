@@ -74,6 +74,7 @@ const Footer = () => {
           <h3>Services</h3>
           <FooterLink to="/services#updates">Daily Updates</FooterLink>
           <FooterLink to="/services#grant-support">Grant Support</FooterLink>
+          <FooterLink to="/services#scholarships">scholarships</FooterLink>
           <FooterLink to="/services#networking">Networking</FooterLink>
           <FooterLink to="/services#workshops">Workshops</FooterLink>
           <FooterLink to="/services#mentorship">Mentorship</FooterLink>

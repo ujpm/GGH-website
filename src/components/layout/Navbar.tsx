@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
+import LogoImage from '../../assets/logo_transparent.png';
 
 const Nav = styled.nav`
   background: white;
@@ -19,15 +20,27 @@ const NavContainer = styled.div`
   align-items: center;
 `;
 
-const Logo = styled(Link)`
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: var(--primary);
+const LogoContainer = styled(Link)`
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
   text-decoration: none;
   
   &:hover {
     text-decoration: none;
   }
+`;
+
+const LogoImg = styled.img`
+  height: 40px;
+  width: 40px;
+  object-fit: contain;
+`;
+
+const LogoText = styled.span`
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--primary);
 `;
 
 const NavLinks = styled.div`
@@ -52,9 +65,14 @@ const Navbar = () => {
   return (
     <Nav>
       <NavContainer>
-        <Logo to="/">Global Grants Hub</Logo>
+        <LogoContainer to="/">
+          <LogoImg src={LogoImage} alt="GGH Logo" />
+          <LogoText>Global Grants Hub</LogoText>
+        </LogoContainer>
         <NavLinks>
           <NavLink to="/">Home</NavLink>
+          <NavLink to="/grants">Grants</NavLink>
+          <NavLink to="/scholarships">Scholarships</NavLink>
           <NavLink to="/services">Services</NavLink>
           <NavLink to="/about">About</NavLink>
           <NavLink to="/support">Support Us</NavLink>
