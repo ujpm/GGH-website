@@ -93,6 +93,7 @@ const TestimonialText = styled.p`
   line-height: 1.6;
   margin-bottom: 1.5rem;
   font-style: italic;
+  font-size: 0.95rem;
 `;
 
 const AuthorInfo = styled.div`
@@ -120,13 +121,18 @@ const AuthorDetails = styled.div``;
 const AuthorName = styled.h4`
   color: var(--color-primary);
   margin: 0;
-  font-size: 1.1rem;
+  font-size: 1rem;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 600;
+  letter-spacing: 0.5px;
 `;
 
 const AuthorTitle = styled.p`
   color: #666;
   margin: 0;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
+  font-family: 'Open Sans', sans-serif;
+  font-style: italic;
 `;
 
 const NavigationButton = styled.button<{ direction: 'left' | 'right' }>`

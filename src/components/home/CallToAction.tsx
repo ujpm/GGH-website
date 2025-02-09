@@ -74,8 +74,8 @@ const StyledButton = styled(Button)`
   &:hover {
     transform: scale(1.05);
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-    background: white;
-    color: var(--color-primary);
+    background: var(--color-secondary);
+    color: white;
   }
 
   svg {
@@ -101,6 +101,19 @@ const Stats = styled.div`
 
 const StatItem = styled.div`
   color: white;
+  position: relative;
+
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 40px;
+    height: 2px;
+    background: var(--color-secondary);
+    border-radius: 2px;
+  }
 `;
 
 const StatNumber = styled.div`
@@ -108,11 +121,16 @@ const StatNumber = styled.div`
   font-weight: bold;
   margin-bottom: 0.5rem;
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+  background: linear-gradient(135deg, #ffffff 0%, #f0f0f0 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 `;
 
 const StatLabel = styled.div`
   font-size: 1rem;
   opacity: 0.9;
+  font-family: 'Open Sans', sans-serif;
+  letter-spacing: 1px;
 `;
 
 const CallToAction = () => {
