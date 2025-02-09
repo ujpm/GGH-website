@@ -78,7 +78,7 @@ const BackLink = styled(Link)`
   gap: 0.5rem;
   padding: 1rem 2rem;
   background: var(--color-primary);
-  color: white;
+  color: red;
   text-decoration: none;
   border-radius: 8px;
   font-weight: 600;
