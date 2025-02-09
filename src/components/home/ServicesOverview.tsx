@@ -5,6 +5,8 @@ import grantSupportIcon from 'assets/icons/grant-support.svg';
 import networkingIcon from 'assets/icons/networking.svg';
 import workshopsIcon from 'assets/icons/workshops.svg';
 import { Link } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 
 const Section = styled.section`
   padding: 5rem 0;
@@ -23,23 +25,48 @@ const Section = styled.section`
   }
 `;
 
-const Grid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+const ServicesContainer = styled.div`
+  position: relative;
+  max-width: 1200px;
+  margin: 3rem auto 0;
+  overflow: hidden;
+`;
+
+const ServiceSlider = styled.div<{ transform: string }>`
+  display: flex;
   gap: 2rem;
-  margin-top: 3rem;
+  transition: transform 0.5s ease;
+  transform: ${props => props.transform};
+  padding: 1rem;
 `;
 
 const ServiceCard = styled(Link)`
-  padding: 2rem;
-  background: white;
-  border-radius: 15px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-  transition: all 0.3s ease;
+  flex: 0 0 calc(33.333% - 1.33rem);
   text-decoration: none;
   color: inherit;
+  opacity: 0.7;
+  transform: scale(0.95);
+  transition: all 0.3s ease;
+  
+  &.active {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  @media (max-width: 968px) {
+    flex: 0 0 calc(100% - 2rem);
+  }
+`;
+
+const CardInner = styled.div`
+  background: white;
+  padding: 2rem;
+  border-radius: 15px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
   position: relative;
   overflow: hidden;
+  height: 100%;
+  transition: transform 0.3s ease;
 
   &::before {
     content: '';
@@ -47,24 +74,13 @@ const ServiceCard = styled(Link)`
     top: 0;
     left: 0;
     right: 0;
-    bottom: 0;
-    background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%);
-    opacity: 0;
-    transition: opacity 0.3s ease;
-    z-index: 1;
+    height: 3px;
+    background: linear-gradient(90deg, var(--color-primary), var(--color-secondary));
+    border-radius: 15px 15px 0 0;
   }
 
   &:hover {
     transform: translateY(-5px);
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
-
-    &::before {
-      opacity: 0.05;
-    }
-
-    img {
-      transform: scale(1.1);
-    }
   }
 `;
 
@@ -124,26 +140,43 @@ const SectionSubtitle = styled.p`
   font-size: 1.1rem;
 `;
 
+const NavigationButton = styled.button<{ direction: 'left' | 'right' }>`
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  padding: 1rem;
+  cursor: pointer;
+  z-index: 1;
+
+  ${props => props.direction === 'left' ? 'left: 0;' : 'right: 0;'}
+`;
+
 const services = [
   {
+    id: 1,
     icon: dailyUpdatesIcon,
     title: 'Daily Updates',
     description: 'Stay informed with the latest funding opportunities and resources.',
     link: '/services#updates'
   },
   {
+    id: 2,
     icon: grantSupportIcon,
     title: 'Grant Support',
     description: 'Expert guidance in grant writing and proposal development.',
     link: '/services#support'
   },
   {
+    id: 3,
     icon: networkingIcon,
     title: 'Networking',
     description: 'Connect with professionals and organizations worldwide.',
     link: '/services#network'
   },
   {
+    id: 4,
     icon: workshopsIcon,
     title: 'Workshops',
     description: 'Enhance your skills through training and capacity building.',
@@ -152,6 +185,39 @@ const services = [
 ];
 
 const ServicesOverview = () => {
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [autoPlay, setAutoPlay] = useState(true);
+  const [isHovered, setIsHovered] = useState(false);
+
+  useEffect(() => {
+    let interval: NodeJS.Timeout;
+    if (autoPlay && !isHovered) {
+      interval = setInterval(() => {
+        setCurrentIndex((prev) => (prev + 1) % services.length);
+      }, 4000);
+    }
+    return () => clearInterval(interval);
+  }, [autoPlay, isHovered]);
+
+  const handlePrev = () => {
+    setAutoPlay(false);
+    setCurrentIndex((prev) => 
+      prev === 0 ? services.length - 1 : prev - 1
+    );
+  };
+
+  const handleNext = () => {
+    setAutoPlay(false);
+    setCurrentIndex((prev) => 
+      (prev + 1) % services.length
+    );
+  };
+
+  const getTransform = () => {
+    const baseTransform = -currentIndex * (33.333 + 2);
+    return `translateX(${baseTransform}%)`;
+  };
+
   return (
     <Section>
       <Container>
@@ -159,17 +225,34 @@ const ServicesOverview = () => {
         <SectionSubtitle>
           Comprehensive support to help you secure funding and implement successful projects
         </SectionSubtitle>
-        <Grid>
-          {services.map((service, index) => (
-            <ServiceCard key={index} to={service.link}>
-              <IconWrapper>
-                <img src={service.icon} alt={service.title} />
-              </IconWrapper>
-              <ServiceTitle>{service.title}</ServiceTitle>
-              <ServiceDescription>{service.description}</ServiceDescription>
-            </ServiceCard>
-          ))}
-        </Grid>
+        <ServicesContainer
+          onMouseEnter={() => setIsHovered(true)}
+          onMouseLeave={() => setIsHovered(false)}
+        >
+          <ServiceSlider transform={getTransform()}>
+            {services.map((service, index) => (
+              <ServiceCard 
+                key={service.id}
+                to={service.link}
+                className={index === currentIndex ? 'active' : ''}
+              >
+                <CardInner>
+                  <IconWrapper>
+                    <img src={service.icon} alt={service.title} />
+                  </IconWrapper>
+                  <ServiceTitle>{service.title}</ServiceTitle>
+                  <ServiceDescription>{service.description}</ServiceDescription>
+                </CardInner>
+              </ServiceCard>
+            ))}
+          </ServiceSlider>
+          <NavigationButton direction="left" onClick={handlePrev}>
+            <FaChevronLeft />
+          </NavigationButton>
+          <NavigationButton direction="right" onClick={handleNext}>
+            <FaChevronRight />
+          </NavigationButton>
+        </ServicesContainer>
       </Container>
     </Section>
   );

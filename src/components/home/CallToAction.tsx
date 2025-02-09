@@ -9,6 +9,7 @@ const Section = styled.section`
   text-align: center;
   position: relative;
   overflow: hidden;
+  z-index: 1;
 
   &::before,
   &::after {
@@ -18,7 +19,8 @@ const Section = styled.section`
     height: 20rem;
     border-radius: 50%;
     background: rgba(255, 255, 255, 0.1);
-    z-index: 1;
+    backdrop-filter: blur(8px);
+    z-index: -1;
   }
 
   &::before {
@@ -30,6 +32,12 @@ const Section = styled.section`
     bottom: -10rem;
     right: -10rem;
   }
+
+  // Add this to ensure content remains clear
+  > * {
+    position: relative;
+    z-index: 2;
+  }
 `;
 
 const Content = styled.div`
@@ -37,16 +45,17 @@ const Content = styled.div`
   margin: 0 auto;
   position: relative;
   z-index: 2;
+  background: transparent;
 `;
 
 const Title = styled.h2`
-  color: var(--color-primary);
   margin-bottom: 1.5rem;
   font-size: 3rem;
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
-  background: linear-gradient(135deg, var(--color-primary) 0%, #9c27b0 100%);
+  font-weight: bold;
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
+  letter-spacing: -0.5px;
 
   @media (max-width: 768px) {
     font-size: 2.5rem;
@@ -54,19 +63,16 @@ const Title = styled.h2`
 `;
 
 const Description = styled.p`
-  background: linear-gradient(135deg, #ffffff 80%, var(--color-secondary) 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  color: var(--color-primary);
   margin-bottom: 3rem;
   font-size: 1.25rem;
   line-height: 1.6;
-  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
   font-weight: 500;
 `;
 
 const StyledButton = styled(Button)`
   min-width: 220px;
-  background: white;
+  background: var(--color-secondary);
   color: var(--color-primary);
   border: none;
   display: inline-flex;
@@ -80,8 +86,8 @@ const StyledButton = styled(Button)`
   &:hover {
     transform: scale(1.05);
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-    background: var(--color-secondary);
-    color: white;
+    background: var(--color-primary);
+    color: var(--color-secondary);
   }
 
   svg {
@@ -106,17 +112,16 @@ const Stats = styled.div`
 `;
 
 const StatItem = styled.div`
-  color: white;
+  color: var(--color-primary);
   position: relative;
   padding: 1.5rem;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.05) 100%);
+  background: rgba(255, 255, 255, 0.95);
   border-radius: 15px;
   transition: transform 0.3s ease;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 
   &:hover {
     transform: translateY(-5px);
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0.1) 100%);
   }
 
   &::after {
@@ -136,21 +141,18 @@ const StatNumber = styled.div`
   font-size: 3rem;
   font-weight: bold;
   margin-bottom: 0.5rem;
-  background: linear-gradient(135deg, #ffffff 0%, var(--color-secondary) 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+  color: var(--color-primary);
   font-family: 'Montserrat', sans-serif;
+  letter-spacing: -0.5px;
 `;
 
 const StatLabel = styled.div`
   font-size: 1.1rem;
-  background: linear-gradient(135deg, #ffffff 0%, var(--color-secondary) 80%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  color: var(--color-primary);
   font-family: 'Open Sans', sans-serif;
   letter-spacing: 1px;
   font-weight: 500;
+  opacity: 0.9;
 `;
 
 const CallToAction = () => {
