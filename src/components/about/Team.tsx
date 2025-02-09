@@ -30,18 +30,34 @@ const TeamGrid = styled.div`
 const teamMembers: TeamMemberType[] = [
   {
     id: 1,
-    name: "John Doe",
+    name: "Chief",
     role: "Founder & CEO",
-    bio: "Passionate about empowering organizations and driving positive change in communities worldwide.",
+    bio: "Empowering organizations and driving positive change in communities worldwide.",
     image: "/team/john-doe.jpg", // Add actual image path
     contacts: {
-      email: "john@globalgrantshub.org",
+      email: "chief@globalgrantshub.org",
       phone: "+256788886782",
       whatsapp: "256788886782"
     },
     socials: {
-      linkedin: "https://linkedin.com/in/johndoe",
-      twitter: "https://twitter.com/johndoe"
+      linkedin: "https://linkedin.com/in/ujeanpierre45",
+      twitter: "https://twitter.com/chief"
+    }
+  },
+  {
+    id: 2,
+    name: "XXX",
+    role: "CTO",
+    bio: "Lorem ipsum gutir ipsum ipsum hakhum.",
+    image: "/team/john-doe.jpg", // Add actual image path
+    contacts: {
+      email: "chief@globalgrantshub.org",
+      phone: "+256788886782",
+      whatsapp: "256788886782"
+    },
+    socials: {
+      linkedin: "https://linkedin.com/in/ujeanpierre45",
+      twitter: "https://twitter.com/xxxx"
     }
   },
   // Add more team members here

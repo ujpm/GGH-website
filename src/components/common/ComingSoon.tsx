@@ -76,18 +76,25 @@ const BackLink = styled(Link)`
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  padding: 0.8rem 1.5rem;
+  padding: 1rem 2rem;
   background: var(--color-primary);
   color: white;
   text-decoration: none;
   border-radius: 8px;
-  font-weight: 500;
+  font-weight: 600;
+  font-size: 1.1rem;
   transition: all 0.3s ease;
-  animation: ${pulse} 2s ease-in-out infinite;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
 
   &:hover {
     transform: translateY(-2px);
     background: var(--color-secondary);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+  }
+
+  @media (max-width: 768px) {
+    padding: 0.8rem 1.5rem;
+    font-size: 1rem;
   }
 `;
 

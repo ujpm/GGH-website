@@ -126,18 +126,28 @@ const SectionTitle = styled.h2`
 `;
 
 const StorySection = styled.div`
-  margin: 4rem 0;
+  margin: 6rem 0;
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 3rem;
+  gap: 4rem;
   align-items: center;
+
+  @media (max-width: 768px) {
+    margin: 4rem 0;
+    gap: 3rem;
+  }
 `;
 
 const StoryContent = styled.div`
   p {
     line-height: 1.8;
     color: #4a4a4a;
-    margin-bottom: 1.5rem;
+    margin-bottom: 2rem;
+    font-size: 1.1rem;
+  }
+
+  @media (max-width: 768px) {
+    order: ${props => props.reverse ? 2 : 1};
   }
 `;
 
@@ -156,6 +166,11 @@ const StoryImage = styled.div`
 
   &:hover img {
     transform: scale(1.05);
+  }
+
+  @media (max-width: 768px) {
+    order: ${props => props.reverse ? 1 : 2};
+    margin: 2rem 0;
   }
 `;
 
@@ -251,6 +266,10 @@ const About = () => {
               witnessed firsthand the challenges that CSOs, NGOs, and entrepreneurs faced
               in securing grants and resources.
             </p>
+            <p>
+              Our platform emerged as a solution to bridge the gap between impactful ideas
+              and the resources needed to bring them to life.
+            </p>
           </StoryContent>
           <StoryImage>
             <img src={helpingOrgs} alt="Helping Organizations" />
@@ -258,16 +277,20 @@ const About = () => {
         </StorySection>
 
         <StorySection>
-          <StoryImage>
+          <StoryImage reverse>
             <img src={gghMeeting} alt="GGH Meeting" />
           </StoryImage>
-          <StoryContent>
+          <StoryContent reverse>
             <p>
               What started as a small initiative to share grant opportunities quickly
               evolved into something much bigger. The team realized that organizations
               needed more than just information – they needed comprehensive support,
               guidance, and a community of like-minded individuals who could share
               experiences and resources.
+            </p>
+            <p>
+              Through dedication and continuous improvement, we developed a comprehensive
+              platform that addresses the multifaceted needs of organizations seeking funding.
             </p>
             <p>
               Today, Global Grants Hub has grown into a vibrant platform that connects
@@ -282,9 +305,17 @@ const About = () => {
             <p>
               Our journey continues as we expand our services and reach, always guided
               by our core mission: to empower those who are working to make the world
-              a better place. We believe that by providing the right resources and
-              support, we can help turn powerful ideas into reality and create lasting
-              impact in communities worldwide.
+              a better place.
+            </p>
+            <p>
+              We've witnessed countless success stories of organizations that have secured
+              funding through our platform, implemented life-changing projects, and created
+              lasting impact in their communities.
+            </p>
+            <p>
+              We believe that by providing the right resources and support, we can help
+              turn powerful ideas into reality and create lasting impact in communities
+              worldwide. Join us in this mission to make positive change accessible to all.
             </p>
           </StoryContent>
           <StoryImage>
