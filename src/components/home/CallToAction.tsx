@@ -54,7 +54,6 @@ const Title = styled.h2`
   font-weight: bold;
   background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%);
   -webkit-background-clip: text;
-  
   letter-spacing: -0.5px;
 
   @media (max-width: 768px) {

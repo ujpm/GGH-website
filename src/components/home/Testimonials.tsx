@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import Container from '../common/Container';
 import { FaQuoteLeft, FaChevronLeft, FaChevronRight } from 'react-icons/fa';

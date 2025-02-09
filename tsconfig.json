@@ -24,7 +24,8 @@
       "styles/*": ["src/styles/*"]
     },
     "allowSyntheticDefaultImports": true,
-    "esModuleInterop": true
+    "esModuleInterop": true,
+    "types": ["node"]
   },
   "include": ["src/**/*", "src/types/*.d.ts"],
   "references": [{ "path": "./tsconfig.node.json" }]
