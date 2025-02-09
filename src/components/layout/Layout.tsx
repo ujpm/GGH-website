@@ -1,6 +1,7 @@
 import styled from 'styled-components';
 import Navbar from './Navbar';
 import Footer from './Footer';
+import DeveloperCredit from '../common/DeveloperCredit';
 
 const Main = styled.main`
   margin-top: 70px; // Height of the fixed navbar
@@ -17,6 +18,7 @@ const Layout = ({ children }: LayoutProps) => {
       <Navbar />
       <Main>{children}</Main>
       <Footer />
+      <DeveloperCredit />
     </>
   );
 };

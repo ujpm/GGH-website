@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import Layout from './components/layout/Layout'
 import HomePage from './pages/home'
 import About from './pages/About'
+import ComingSoon from './components/common/ComingSoon'
 
 function App() {
   return (
@@ -9,10 +10,15 @@ function App() {
       <Layout>
         <Routes>
           <Route path="/" element={<HomePage />} />
-          <Route path="/services" element={<div>Services</div>} />
           <Route path="/about" element={<About />} />
-          <Route path="/support" element={<div>Support Us</div>} />
-          <Route path="/contact" element={<div>Contact</div>} />
+          {/* Routes with ComingSoon */}
+          <Route path="/grants" element={<ComingSoon />} />
+          <Route path="/scholarships" element={<ComingSoon />} />
+          <Route path="/services" element={<ComingSoon />} />
+          <Route path="/support" element={<ComingSoon />} />
+          <Route path="/contact" element={<ComingSoon />} />
+          {/* Catch all unknown routes */}
+          <Route path="*" element={<ComingSoon />} />
         </Routes>
       </Layout>
     </Router>
