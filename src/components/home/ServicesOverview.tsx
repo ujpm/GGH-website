@@ -44,8 +44,8 @@ const ServiceCard = styled(Link)`
   flex: 0 0 calc(33.333% - 1.33rem);
   text-decoration: none;
   color: inherit;
-  opacity: 0.7;
-  transform: scale(0.95);
+  opacity: 0.9;
+  transform: scale(0.98);
   transition: all 0.3s ease;
   
   &.active {
@@ -60,13 +60,14 @@ const ServiceCard = styled(Link)`
 
 const CardInner = styled.div`
   background: white;
-  padding: 2rem;
+  padding: 2.5rem;
   border-radius: 15px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
   position: relative;
   overflow: hidden;
   height: 100%;
-  transition: transform 0.3s ease;
+  transition: all 0.3s ease;
+  border: 1px solid rgba(var(--color-primary-rgb), 0.1);
 
   &::before {
     content: '';
@@ -74,27 +75,36 @@ const CardInner = styled.div`
     top: 0;
     left: 0;
     right: 0;
-    height: 3px;
+    height: 4px;
     background: linear-gradient(90deg, var(--color-primary), var(--color-secondary));
     border-radius: 15px 15px 0 0;
   }
 
   &:hover {
     transform: translateY(-5px);
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.12);
+    border-color: rgba(var(--color-primary-rgb), 0.2);
   }
 `;
 
 const IconWrapper = styled.div`
-  width: 60px;
-  height: 60px;
+  width: 70px;
+  height: 70px;
   margin-bottom: 1.5rem;
   position: relative;
   z-index: 2;
+  padding: 1rem;
+  background: linear-gradient(135deg, rgba(var(--color-primary-rgb), 0.1) 0%, rgba(var(--color-secondary-rgb), 0.1) 100%);
+  border-radius: 12px;
   
   img {
     width: 100%;
     height: 100%;
     transition: transform 0.3s ease;
+  }
+
+  ${ServiceCard}:hover & img {
+    transform: scale(1.1);
   }
 `;
 
@@ -104,53 +114,69 @@ const ServiceTitle = styled.h3`
   position: relative;
   z-index: 2;
   font-size: 1.5rem;
+  font-weight: 600;
+  letter-spacing: -0.5px;
 `;
 
 const ServiceDescription = styled.p`
-  color: #666;
-  line-height: 1.6;
+  color: #4a5568;
+  line-height: 1.7;
   position: relative;
   z-index: 2;
-  font-size: 0.95rem;
+  font-size: 1rem;
 `;
 
 const SectionTitle = styled.h2`
   text-align: center;
   color: var(--color-primary);
-  font-size: 2.5rem;
-  margin-bottom: 1rem;
+  font-size: 2.75rem;
+  margin-bottom: 1.5rem;
   position: relative;
+  font-weight: bold;
+  letter-spacing: -0.5px;
 
   &::after {
     content: '';
     display: block;
-    width: 60px;
-    height: 3px;
+    width: 80px;
+    height: 4px;
     background: var(--color-secondary);
-    margin: 1rem auto;
+    margin: 1.5rem auto;
+    border-radius: 2px;
   }
 `;
 
 const SectionSubtitle = styled.p`
   text-align: center;
-  color: #666;
-  max-width: 600px;
-  margin: 0 auto 2rem;
-  line-height: 1.6;
-  font-size: 1.1rem;
+  color: #4a5568;
+  max-width: 700px;
+  margin: 0 auto 3rem;
+  line-height: 1.7;
+  font-size: 1.2rem;
+  font-weight: 500;
 `;
 
 const NavigationButton = styled.button<{ direction: 'left' | 'right' }>`
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
-  background: none;
+  background: white;
   border: none;
   padding: 1rem;
   cursor: pointer;
   z-index: 1;
+  border-radius: 50%;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  color: var(--color-primary);
+  transition: all 0.3s ease;
 
-  ${props => props.direction === 'left' ? 'left: 0;' : 'right: 0;'}
+  &:hover {
+    background: var(--color-primary);
+    color: white;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+  }
+
+  ${props => props.direction === 'left' ? 'left: -1rem;' : 'right: -1rem;'}
 `;
 
 const services = [
