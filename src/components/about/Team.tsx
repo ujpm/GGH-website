@@ -72,6 +72,38 @@ const teamMembers: TeamMemberType[] = [
       twitter: "https://twitter.com/xxxx"
     }
   },
+  {
+    id: 2,
+    name: "XXX",
+    role: "CTO",
+    bio: "Lorem ipsum gutir ipsum ipsum hakhum.",
+    image: logo,
+    contacts: {
+      email: "chief@globalgrantshub.org",
+      phone: "+256788886782",
+      whatsapp: "256788886782"
+    },
+    socials: {
+      linkedin: "https://linkedin.com/in/ujeanpierre45",
+      twitter: "https://twitter.com/xxxx"
+    }
+  },
+  {
+    id: 2,
+    name: "XXX",
+    role: "CTO",
+    bio: "Lorem ipsum gutir ipsum ipsum hakhum.",
+    image: logo,
+    contacts: {
+      email: "chief@globalgrantshub.org",
+      phone: "+256788886782",
+      whatsapp: "256788886782"
+    },
+    socials: {
+      linkedin: "https://linkedin.com/in/ujeanpierre45",
+      twitter: "https://twitter.com/xxxx"
+    }
+  },
   // Add more team members here
 ];
 
