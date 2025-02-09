@@ -5,6 +5,11 @@ import helpingOrgs from 'assets/helping-organizations.jpeg';
 import gghMeeting from 'assets/GGH-meeting.png';
 import growing from 'assets/growing.jpg';
 
+// Add interface for components with reverse prop
+interface ReverseProps {
+  $reverse?: boolean;
+}
+
 const PageContainer = styled.div`
   min-height: 100vh;
 `;
@@ -138,7 +143,7 @@ const StorySection = styled.div`
   }
 `;
 
-const StoryContent = styled.div`
+const StoryContent = styled.div<ReverseProps>`
   p {
     line-height: 1.8;
     color: #4a4a4a;
@@ -147,11 +152,11 @@ const StoryContent = styled.div`
   }
 
   @media (max-width: 768px) {
-    order: ${props => props.reverse ? 2 : 1};
+    order: ${props => props.$reverse ? 2 : 1};
   }
 `;
 
-const StoryImage = styled.div`
+const StoryImage = styled.div<ReverseProps>`
   position: relative;
   border-radius: 20px;
   overflow: hidden;
@@ -169,7 +174,7 @@ const StoryImage = styled.div`
   }
 
   @media (max-width: 768px) {
-    order: ${props => props.reverse ? 1 : 2};
+    order: ${props => props.$reverse ? 1 : 2};
     margin: 2rem 0;
   }
 `;
@@ -277,10 +282,10 @@ const About = () => {
         </StorySection>
 
         <StorySection>
-          <StoryImage reverse>
+          <StoryImage $reverse>
             <img src={gghMeeting} alt="GGH Meeting" />
           </StoryImage>
-          <StoryContent reverse>
+          <StoryContent $reverse>
             <p>
               What started as a small initiative to share grant opportunities quickly
               evolved into something much bigger. The team realized that organizations
