@@ -21,6 +21,31 @@ const ImageContainer = styled.div`
 
   &:hover {
     transform: scale(1.05);
+    
+    .more-button {
+      opacity: 1;
+    }
+  }
+`;
+
+const MoreButton = styled.button`
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--color-primary);
+  color: white;
+  border: none;
+  padding: 5px 15px;
+  border-radius: 15px;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  z-index: 2;
+  font-size: 0.9rem;
+
+  &:hover {
+    background: var(--color-secondary);
   }
 `;
 
@@ -149,6 +174,12 @@ const TeamMember: React.FC<Props> = ({ member }) => {
       <Card>
         <ImageContainer onClick={() => setShowDetails(true)}>
           <Image src={member.image} alt={member.name} />
+          <MoreButton className="more-button" onClick={(e) => {
+            e.stopPropagation();
+            setShowDetails(true);
+          }}>
+            More
+          </MoreButton>
         </ImageContainer>
         <Name>{member.name}</Name>
         <Role>{member.role}</Role>

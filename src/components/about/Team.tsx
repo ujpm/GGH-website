@@ -1,10 +1,11 @@
 import styled from 'styled-components';
 import TeamMember from './TeamMember';
 import { TeamMember as TeamMemberType } from '../../types/team';
+import logo from "../../assets/logo.png";
 
 const Section = styled.section`
   padding: 4rem 2rem;
-  background: #f9f9f9;
+  background: #f8f9fa;
 `;
 
 const Container = styled.div`
@@ -17,13 +18,24 @@ const Title = styled.h2`
   color: var(--color-primary);
   font-size: 2.5rem;
   margin-bottom: 3rem;
+  position: relative;
+
+  &::after {
+    content: '';
+    display: block;
+    width: 60px;
+    height: 3px;
+    background: var(--color-secondary);
+    margin: 1rem auto;
+  }
 `;
 
 const TeamGrid = styled.div`
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 2rem;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 3rem;
   justify-items: center;
+  margin-top: 2rem;
 `;
 
 // Sample team data - replace with actual team data
@@ -33,7 +45,7 @@ const teamMembers: TeamMemberType[] = [
     name: "Chief",
     role: "Founder & CEO",
     bio: "Empowering organizations and driving positive change in communities worldwide.",
-    image: "/team/john-doe.jpg", // Add actual image path
+    image: logo,
     contacts: {
       email: "chief@globalgrantshub.org",
       phone: "+256788886782",
@@ -49,7 +61,7 @@ const teamMembers: TeamMemberType[] = [
     name: "XXX",
     role: "CTO",
     bio: "Lorem ipsum gutir ipsum ipsum hakhum.",
-    image: "/team/john-doe.jpg", // Add actual image path
+    image: logo,
     contacts: {
       email: "chief@globalgrantshub.org",
       phone: "+256788886782",
