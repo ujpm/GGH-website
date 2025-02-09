@@ -1,5 +1,10 @@
 import styled from 'styled-components';
 import Container from '../common/Container';
+import dailyUpdatesIcon from 'assets/icons/daily-updates.svg';
+import grantSupportIcon from 'assets/icons/grant-support.svg';
+import networkingIcon from 'assets/icons/networking.svg';
+import workshopsIcon from 'assets/icons/workshops.svg';
+import mentorshipIcon from 'assets/icons/mentorship.svg';
 
 const Section = styled.section`
   padding: 5rem 0;
@@ -49,6 +54,7 @@ const ServiceDescription = styled.p`
 const SectionTitle = styled.h2`
   text-align: center;
   color: var(--secondary);
+  font-size: 2.5rem;
   margin-bottom: 1rem;
 `;
 
@@ -57,31 +63,32 @@ const SectionSubtitle = styled.p`
   color: var(--text-secondary);
   max-width: 600px;
   margin: 0 auto 2rem;
+  line-height: 1.6;
 `;
 
 const services = [
   {
-    icon: '/src/assets/icons/daily-updates.svg',
+    icon: dailyUpdatesIcon,
     title: 'Daily Updates',
-    description: 'Stay informed with the latest funding opportunities and donor calls to keep you ahead in your funding journey.'
+    description: 'Stay informed with the latest funding opportunities and resources to keep you ahead.'
   },
   {
-    icon: '/src/assets/icons/grant-support.svg',
+    icon: grantSupportIcon,
     title: 'Grant Support',
-    description: 'Access expertise in grant writing, proposal drafting, and strategic planning to increase your funding success.'
+    description: 'Get expert guidance in grant writing and proposal development to secure funding.'
   },
   {
-    icon: '/src/assets/icons/networking.svg',
+    icon: networkingIcon,
     title: 'Networking',
-    description: 'Connect with professionals and organizations, fostering collaboration and sharing of resources.'
+    description: 'Connect with professionals and organizations to share resources and collaborate.'
   },
   {
-    icon: '/src/assets/icons/workshops.svg',
-    title: 'Workshops & Training',
+    icon: workshopsIcon,
+    title: 'Workshops',
     description: 'Enhance your skills through regular workshops and training sessions designed to build capacity.'
   },
   {
-    icon: '/src/assets/icons/mentorship.svg',
+    icon: mentorshipIcon,
     title: 'Mentorship',
     description: 'Receive guidance from experienced leaders to navigate challenges and achieve success in your projects.'
   }
