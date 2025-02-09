@@ -168,38 +168,38 @@ const NavigationButton = styled.button<{ direction: 'left' | 'right' }>`
 const testimonials = [
   {
     id: 1,
-    text: "Global Grants Hub has been instrumental in helping us secure funding for our community projects. Their platform and support are exceptional!",
-    author: "Sarah Johnson",
-    title: "Executive Director, Community First",
-    image: "/assets/testimonials/sarah.jpg"
+    text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. The platform exceeded all my expectations with its intuitive interface!",
+    author: "Alex Morgan",
+    title: "Project Lead, Innovation Hub",
+    image: "/src/assets/user-example.webp"
   },
   {
     id: 2,
-    text: "The resources and guidance provided by GGH have transformed how we approach grant writing. We've seen a significant increase in our success rate.",
-    author: "Michael Chen",
-    title: "Program Manager, Tech4Good",
-    image: "/assets/testimonials/michael.jpg"
+    text: "Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. A game-changing resource for our organization.",
+    author: "Sam Wilson",
+    title: "Director, Future Forward",
+    image: "/src/assets/user-example.webp"
   },
   {
     id: 3,
-    text: "As a small nonprofit, GGH's platform has given us access to opportunities we wouldn't have found otherwise. Their support is invaluable.",
-    author: "Emma Rodriguez",
-    title: "Founder, Youth Empowerment Initiative",
-    image: "/assets/testimonials/emma.jpg"
+    text: "Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
+    author: "Jordan Lee",
+    title: "Founder, Tech Solutions",
+    image: "/src/assets/user-example.webp"
   },
   {
     id: 4,
-    text: "The workshops and networking opportunities provided by GGH have helped us build valuable partnerships and improve our grant writing skills.",
-    author: "David Thompson",
-    title: "Grant Coordinator, Environmental Action",
-    image: "/assets/testimonials/david.jpg"
+    text: "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.",
+    author: "Taylor Reed",
+    title: "Program Manager, Future Initiatives",
+    image: "/src/assets/user-example.webp"
   },
   {
     id: 5,
-    text: "Thanks to GGH, we've been able to expand our reach and impact. Their platform is user-friendly and their team is always there to help.",
-    author: "Lisa Patel",
-    title: "Director, Healthcare Access Now",
-    image: "/assets/testimonials/lisa.jpg"
+    text: "Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
+    author: "Casey Kim",
+    title: "Executive Director, Innovation Lab",
+    image: "/src/assets/user-example.webp"
   }
 ];
 
