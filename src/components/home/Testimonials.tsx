@@ -12,7 +12,7 @@ const Section = styled.section`
 
 const SectionTitle = styled.h2`
   text-align: center;
-  color: var(--color-primary);
+  color: var(--color-secondary);
   font-size: 2.5rem;
   margin-bottom: 1rem;
   position: relative;
@@ -22,7 +22,7 @@ const SectionTitle = styled.h2`
     display: block;
     width: 60px;
     height: 3px;
-    background: var(--color-secondary);
+    background: var(--color-primary);
     margin: 1rem auto;
   }
 `;

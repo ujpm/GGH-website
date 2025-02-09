@@ -40,10 +40,13 @@ const Content = styled.div`
 `;
 
 const Title = styled.h2`
-  color: white;
+  color: var(--color-primary);
   margin-bottom: 1.5rem;
   font-size: 3rem;
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+  background: linear-gradient(135deg, var(--color-primary) 0%, #9c27b0 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 
   @media (max-width: 768px) {
     font-size: 2.5rem;
@@ -51,11 +54,14 @@ const Title = styled.h2`
 `;
 
 const Description = styled.p`
-  color: rgba(255, 255, 255, 0.9);
+  background: linear-gradient(135deg, #ffffff 80%, var(--color-secondary) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
   margin-bottom: 3rem;
   font-size: 1.25rem;
   line-height: 1.6;
-  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+  font-weight: 500;
 `;
 
 const StyledButton = styled(Button)`
@@ -102,35 +108,49 @@ const Stats = styled.div`
 const StatItem = styled.div`
   color: white;
   position: relative;
+  padding: 1.5rem;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.05) 100%);
+  border-radius: 15px;
+  transition: transform 0.3s ease;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+
+  &:hover {
+    transform: translateY(-5px);
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0.1) 100%);
+  }
 
   &::after {
     content: '';
     position: absolute;
-    bottom: -10px;
+    bottom: -2px;
     left: 50%;
     transform: translateX(-50%);
     width: 40px;
-    height: 2px;
+    height: 3px;
     background: var(--color-secondary);
     border-radius: 2px;
   }
 `;
 
 const StatNumber = styled.div`
-  font-size: 2.5rem;
+  font-size: 3rem;
   font-weight: bold;
   margin-bottom: 0.5rem;
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
-  background: linear-gradient(135deg, #ffffff 0%, #f0f0f0 100%);
+  background: linear-gradient(135deg, #ffffff 0%, var(--color-secondary) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+  font-family: 'Montserrat', sans-serif;
 `;
 
 const StatLabel = styled.div`
-  font-size: 1rem;
-  opacity: 0.9;
+  font-size: 1.1rem;
+  background: linear-gradient(135deg, #ffffff 0%, var(--color-secondary) 80%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
   font-family: 'Open Sans', sans-serif;
   letter-spacing: 1px;
+  font-weight: 500;
 `;
 
 const CallToAction = () => {
