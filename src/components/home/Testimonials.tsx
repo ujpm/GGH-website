@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import Container from '../common/Container';
 import { FaQuoteLeft, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
+import userExample from 'assets/user-example.webp';
 
 const Section = styled.section`
   padding: 5rem 0;
@@ -171,35 +172,35 @@ const testimonials = [
     text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. The platform exceeded all my expectations with its intuitive interface!",
     author: "Alex Morgan",
     title: "Project Lead, Innovation Hub",
-    image: "/src/assets/user-example.webp"
+    image: userExample
   },
   {
     id: 2,
     text: "Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. A game-changing resource for our organization.",
     author: "Sam Wilson",
     title: "Director, Future Forward",
-    image: "/src/assets/user-example.webp"
+    image: userExample
   },
   {
     id: 3,
     text: "Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
     author: "Jordan Lee",
     title: "Founder, Tech Solutions",
-    image: "/src/assets/user-example.webp"
+    image: userExample
   },
   {
     id: 4,
     text: "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.",
     author: "Taylor Reed",
     title: "Program Manager, Future Initiatives",
-    image: "/src/assets/user-example.webp"
+    image: userExample
   },
   {
     id: 5,
     text: "Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
     author: "Casey Kim",
     title: "Executive Director, Innovation Lab",
-    image: "/src/assets/user-example.webp"
+    image: userExample
   }
 ];
 

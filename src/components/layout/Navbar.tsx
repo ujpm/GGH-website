@@ -1,15 +1,22 @@
-import { Link } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { Link, useLocation } from 'react-router-dom';
 import styled from 'styled-components';
 import LogoImage from '../../assets/logo_transparent.png';
+import { FaBars, FaTimes } from 'react-icons/fa';
 
 const Nav = styled.nav`
   background: white;
-  padding: 1rem 2rem;
+  padding: 0.8rem 1.5rem;
   box-shadow: 0 2px 4px rgba(0,0,0,0.1);
   position: fixed;
   width: 100%;
   top: 0;
   z-index: 1000;
+  transition: all 0.3s ease;
+
+  @media (max-width: 768px) {
+    padding: 0.6rem 1rem;
+  }
 `;
 
 const NavContainer = styled.div`
@@ -23,11 +30,17 @@ const NavContainer = styled.div`
 const LogoContainer = styled(Link)`
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.8rem;
   text-decoration: none;
+  transition: all 0.3s ease;
   
   &:hover {
     text-decoration: none;
+    transform: translateY(-1px);
+  }
+
+  @media (max-width: 768px) {
+    gap: 0.4rem;
   }
 `;
 
@@ -35,48 +48,203 @@ const LogoImg = styled.img`
   height: 40px;
   width: 40px;
   object-fit: contain;
+  transition: all 0.3s ease;
+
+  @media (max-width: 768px) {
+    height: 35px;
+    width: 35px;
+  }
 `;
 
 const LogoText = styled.span`
-  font-size: 1.5rem;
+  font-size: 1.4rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--color-primary);
+  transition: all 0.3s ease;
+
+  @media (max-width: 968px) {
+    font-size: 1.2rem;
+  }
+
+  @media (max-width: 768px) {
+    display: none;
+  }
 `;
 
-const NavLinks = styled.div`
+const NavLinks = styled.div<{ isOpen: boolean }>`
   display: flex;
   gap: 2rem;
   align-items: center;
+
+  @media (max-width: 968px) {
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    top: 0;
+    right: ${props => props.isOpen ? '0' : '-100%'};
+    width: 280px;
+    height: 100vh;
+    background: white;
+    padding: 5rem 2rem 2rem;
+    gap: 1.5rem;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: -2px 0 10px rgba(0,0,0,0.1);
+    z-index: 1000;
+  }
 `;
 
-const NavLink = styled(Link)`
-  color: var(--text);
+const NavLink = styled(Link)<{ $isActive?: boolean }>`
+  color: ${props => props.$isActive ? 'var(--color-primary)' : 'var(--text)'};
   text-decoration: none;
-  font-weight: 500;
-  transition: color 0.2s;
+  font-weight: ${props => props.$isActive ? '600' : '500'};
+  font-size: 1rem;
+  transition: all 0.2s ease;
+  padding: 0.5rem 0.8rem;
+  border-radius: 6px;
   
   &:hover {
-    color: var(--primary);
+    color: var(--color-primary);
     text-decoration: none;
+    transform: translateY(-1px);
+  }
+
+  @media (max-width: 968px) {
+    font-size: 1.1rem;
+    width: 100%;
+    text-align: center;
+    padding: 0.8rem;
+    border-radius: 8px;
+    background: ${props => props.$isActive ? 'var(--color-primary)' : 'transparent'};
+    color: ${props => props.$isActive ? 'white' : 'var(--text)'};
+
+    &:hover {
+      background: var(--color-primary);
+      color: white;
+      transform: none;
+    }
+  }
+`;
+
+const MenuButton = styled.button`
+  display: none;
+  background: none;
+  border: none;
+  padding: 0.5rem;
+  font-size: 1.4rem;
+  cursor: pointer;
+  color: var(--color-primary);
+  z-index: 2000;
+  transition: all 0.3s ease;
+
+  &:hover {
+    color: var(--color-secondary);
+    transform: scale(1.1);
+  }
+
+  @media (max-width: 968px) {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+`;
+
+const Overlay = styled.div<{ isOpen: boolean }>`
+  display: none;
+  
+  @media (max-width: 968px) {
+    display: block;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    opacity: ${props => props.isOpen ? 1 : 0};
+    visibility: ${props => props.isOpen ? 'visible' : 'hidden'};
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 999;
+    backdrop-filter: blur(4px);
+  }
+`;
+
+const CloseButton = styled(FaTimes)`
+  position: absolute;
+  top: 1.2rem;
+  right: 1.2rem;
+  font-size: 1.4rem;
+  color: var(--color-primary);
+  cursor: pointer;
+  display: none;
+  transition: all 0.3s ease;
+
+  &:hover {
+    color: var(--color-secondary);
+    transform: scale(1.1);
+  }
+
+  @media (max-width: 968px) {
+    display: block;
   }
 `;
 
 const Navbar = () => {
+  const [isOpen, setIsOpen] = useState(false);
+  const location = useLocation();
+
+  // Prevent body scroll when menu is open
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [isOpen]);
+
+  const toggleMenu = () => {
+    setIsOpen(!isOpen);
+  };
+
+  const closeMenu = () => {
+    setIsOpen(false);
+  };
+
   return (
     <Nav>
       <NavContainer>
-        <LogoContainer to="/">
+        <LogoContainer to="/" onClick={closeMenu}>
           <LogoImg src={LogoImage} alt="GGH Logo" />
           <LogoText>Global Grants Hub</LogoText>
         </LogoContainer>
-        <NavLinks>
-          <NavLink to="/">Home</NavLink>
-          <NavLink to="/grants">Grants</NavLink>
-          <NavLink to="/scholarships">Scholarships</NavLink>
-          <NavLink to="/services">Services</NavLink>
-          <NavLink to="/about">About</NavLink>
-          <NavLink to="/support">Support Us</NavLink>
-          <NavLink to="/contact">Contact</NavLink>
+        <MenuButton onClick={toggleMenu} aria-label="Toggle menu">
+          <FaBars />
+        </MenuButton>
+        <Overlay isOpen={isOpen} onClick={closeMenu} />
+        <NavLinks isOpen={isOpen}>
+          <CloseButton onClick={closeMenu} />
+          <NavLink to="/" onClick={closeMenu} $isActive={location.pathname === '/'}>
+            Home
+          </NavLink>
+          <NavLink to="/grants" onClick={closeMenu} $isActive={location.pathname === '/grants'}>
+            Grants
+          </NavLink>
+          <NavLink to="/scholarships" onClick={closeMenu} $isActive={location.pathname === '/scholarships'}>
+            Scholarships
+          </NavLink>
+          <NavLink to="/services" onClick={closeMenu} $isActive={location.pathname === '/services'}>
+            Services
+          </NavLink>
+          <NavLink to="/about" onClick={closeMenu} $isActive={location.pathname === '/about'}>
+            About
+          </NavLink>
+          <NavLink to="/support" onClick={closeMenu} $isActive={location.pathname === '/support'}>
+            Support Us
+          </NavLink>
+          <NavLink to="/contact" onClick={closeMenu} $isActive={location.pathname === '/contact'}>
+            Contact
+          </NavLink>
         </NavLinks>
       </NavContainer>
     </Nav>
