@@ -260,20 +260,17 @@ const About = () => {
         <StorySection>
           <StoryContent>
             <p>
-              Global Grants Hub was born from a simple yet powerful observation: countless
-              passionate organizations and individuals with transformative ideas were
-              struggling to access the funding they needed to make a difference in their
-              communities.
+              The Global Grants Hub was founded in 2023 by Richardson Kyeyune, a visionary leader with 
+              a deep passion for empowering communities and driving sustainable development. 
+              Richardson's journey began in 2002 with World Vision Uganda in Rakai District, during his 
+              extensive work with various non-governmental organizations (NGOs) and civil society 
+              organizations (CSOs).
             </p>
             <p>
-              In early 2023, a group of dedicated professionals who had spent years working
-              in the development sector came together with a shared vision. They had
-              witnessed firsthand the challenges that CSOs, NGOs, and entrepreneurs faced
-              in securing grants and resources.
-            </p>
-            <p>
-              Our platform emerged as a solution to bridge the gap between impactful ideas
-              and the resources needed to bring them to life.
+              Having become an orphan at the age of 9 months, Richardson personally understood the need 
+              on the ground to empower lives and create opportunities for those in need. His dedication to 
+              making a difference in the world was ignited during his involvement in grassroots initiatives, 
+              where he saw the transformative power of collaboration and innovation.
             </p>
           </StoryContent>
           <StoryImage>
@@ -287,20 +284,18 @@ const About = () => {
           </StoryImage>
           <StoryContent $reverse>
             <p>
-              What started as a small initiative to share grant opportunities quickly
-              evolved into something much bigger. The team realized that organizations
-              needed more than just information – they needed comprehensive support,
-              guidance, and a community of like-minded individuals who could share
-              experiences and resources.
+              In March 2023, Richardson launched the Global Grants Hub with a clear mission: to 
+              empower civil society organizations, NGOs, entrepreneurs, and students by facilitating 
+              valuable funding opportunities and resources. His vision was to create a dynamic community 
+              where like-minded individuals and organizations could come together, share knowledge, and 
+              collaborate to drive positive change.
             </p>
             <p>
-              Through dedication and continuous improvement, we developed a comprehensive
-              platform that addresses the multifaceted needs of organizations seeking funding.
-            </p>
-            <p>
-              Today, Global Grants Hub has grown into a vibrant platform that connects
-              organizations with funding opportunities, provides expert guidance in grant
-              writing, and facilitates knowledge sharing among our community members.
+              Under Richardson's leadership, the Global Grants Hub has grown into a global network of 
+              passionate and dedicated members, all working towards a common goal of transforming 
+              communities and making a lasting impact. Through mentorship, training, and resource 
+              sharing, the Hub has become a beacon of support and inspiration for organizations and 
+              individuals striving to make a difference.
             </p>
           </StoryContent>
         </StorySection>
@@ -308,19 +303,16 @@ const About = () => {
         <StorySection>
           <StoryContent>
             <p>
-              Our journey continues as we expand our services and reach, always guided
-              by our core mission: to empower those who are working to make the world
-              a better place.
+              Richardson's unwavering commitment to social impact and sustainable development 
+              continues to guide the Global Grants Hub, ensuring that it remains a vital resource for those 
+              seeking to create positive change in the world. His story is a testament to the power of vision, 
+              perseverance, and the belief that by working together, we can achieve remarkable things.
             </p>
             <p>
-              We've witnessed countless success stories of organizations that have secured
-              funding through our platform, implemented life-changing projects, and created
-              lasting impact in their communities.
-            </p>
-            <p>
-              We believe that by providing the right resources and support, we can help
-              turn powerful ideas into reality and create lasting impact in communities
-              worldwide. Join us in this mission to make positive change accessible to all.
+              Through our platform, countless organizations have secured funding, implemented life-changing 
+              projects, and created lasting impact in their communities. We continue to grow and expand 
+              our services, always guided by our core mission of empowering those who are working to 
+              make the world a better place.
             </p>
           </StoryContent>
           <StoryImage>
