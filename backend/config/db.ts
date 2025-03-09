@@ -1,6 +1,7 @@
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import bcrypt from 'bcryptjs';
+import { seedFundingCalls } from './seedData';
 
 dotenv.config();
 
@@ -54,6 +55,9 @@ export const connectDB = async () => {
       });
       console.log('✅ Admin user created');
     }
+
+    // Seed funding calls
+    await seedFundingCalls();
   } catch (error) {
     console.error('❌ MongoDB connection error:', error);
     process.exit(1);

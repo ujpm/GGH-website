@@ -1,6 +1,7 @@
 import { FundingCall } from '../../types/grants';
 import styled from 'styled-components';
 import { format } from 'date-fns';
+import { useAuth } from '../../context/AuthContext';
 
 const Card = styled.div<{ type: string }>`
   background: white;
@@ -218,11 +219,40 @@ const Amount = styled.div`
   }
 `;
 
+const AdminActions = styled.div`
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid #eee;
+`;
+
+const AdminButton = styled.button<{ variant: 'edit' | 'delete' }>`
+  background: ${props => props.variant === 'edit' ? '#E3F2FD' : '#FFEBEE'};
+  color: ${props => props.variant === 'edit' ? '#1976D2' : '#C62828'};
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: ${props => props.variant === 'edit' ? '#BBDEFB' : '#FFCDD2'};
+  }
+`;
+
 interface FundingCallCardProps {
   call: FundingCall;
+  onEdit?: (call: FundingCall) => void;
+  onDelete?: (id: string) => void;
 }
 
-export default function FundingCallCard({ call }: FundingCallCardProps) {
+export default function FundingCallCard({ call, onEdit, onDelete }: FundingCallCardProps) {
+  const { user } = useAuth();
+  const isAdmin = user?.role === 'admin';
+
   return (
     <Card type={call.type}>
       <Header>
@@ -249,12 +279,23 @@ export default function FundingCallCard({ call }: FundingCallCardProps) {
 
       <Footer>
         <Deadline>
-          <strong>Deadline:</strong> {format(new Date(call.deadline), 'MMM d, yyyy')}
+          <strong>Deadline:</strong> {format(new Date(call.deadline), 'MMM dd, yyyy')}
         </Deadline>
-        <ApplyButton href={call.applicationUrl} target="_blank" rel="noopener noreferrer" type={call.type}>
+        <ApplyButton href={call.applicationUrl} target="_blank" type={call.type}>
           Apply Now
         </ApplyButton>
       </Footer>
+      
+      {isAdmin && onEdit && onDelete && (
+        <AdminActions>
+          <AdminButton variant="edit" onClick={() => onEdit(call)}>
+            Edit
+          </AdminButton>
+          <AdminButton variant="delete" onClick={() => onDelete(call.id)}>
+            Delete
+          </AdminButton>
+        </AdminActions>
+      )}
     </Card>
   );
 }

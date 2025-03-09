@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useReducer, useEffect } from 'react';
 import { FundingCall, FundingFilters, FundingStatus } from '../types/grants';
+import { getFundingCalls } from '../services/fundingService';
 
 interface FundingState {
   calls: FundingCall[];
@@ -60,6 +61,23 @@ function fundingReducer(state: FundingState, action: FundingAction): FundingStat
 
 export function FundingProvider({ children }: { children: React.ReactNode }) {
   const [state, dispatch] = useReducer(fundingReducer, initialState);
+
+  // Fetch initial funding calls
+  useEffect(() => {
+    const fetchFundingCalls = async () => {
+      try {
+        dispatch({ type: 'SET_LOADING', payload: true });
+        const calls = await getFundingCalls();
+        dispatch({ type: 'SET_CALLS', payload: calls });
+      } catch (error) {
+        dispatch({ type: 'SET_ERROR', payload: 'Failed to fetch funding calls' });
+      } finally {
+        dispatch({ type: 'SET_LOADING', payload: false });
+      }
+    };
+
+    fetchFundingCalls();
+  }, []);
 
   // Auto-update funding status based on deadlines
   useEffect(() => {

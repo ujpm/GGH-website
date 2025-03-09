@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import styled from 'styled-components';
 import { useAuth } from '../../context/AuthContext';
+import { toast } from 'react-hot-toast';
 
 const EditorContainer = styled.div`
   padding: 2rem;
@@ -86,30 +87,73 @@ const ErrorMessage = styled.div`
 interface ContentData {
   title: string;
   description: string;
-  content: string;
-  status: 'draft' | 'published';
+  type: 'grant' | 'scholarship' | 'resource';
+  organization: string;
+  deadline?: string;
+  fundingInfo?: {
+    amount?: string;
+    currency?: string;
+    duration?: string;
+    type?: string;
+    budget_limit?: string;
+  };
+  eligibility: {
+    criteria: string[];
+    ineligible: string[];
+  };
+  contact?: {
+    name?: string;
+    email?: string;
+    phone?: string;
+    website?: string;
+  };
+  applicationUrl?: string;
+  status: 'open' | 'closing_soon' | 'closed';
+  featured?: boolean;
+  tags: string[];
 }
 
 const ContentEditor: React.FC = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
   const { user } = useAuth();
   const [error, setError] = useState<string | null>(null);
   const [formData, setFormData] = useState<ContentData>({
     title: '',
     description: '',
-    content: '',
-    status: 'draft',
+    type: (location.state?.type as ContentData['type']) || 'grant',
+    organization: '',
+    deadline: new Date().toISOString().split('T')[0],
+    fundingInfo: {
+      amount: '',
+      currency: 'USD',
+      duration: '',
+      type: '',
+      budget_limit: ''
+    },
+    eligibility: {
+      criteria: [''],
+      ineligible: ['']
+    },
+    contact: {
+      name: '',
+      email: '',
+      phone: '',
+      website: ''
+    },
+    applicationUrl: '',
+    status: 'open',
+    featured: false,
+    tags: []
   });
 
   useEffect(() => {
-    // Check if user is admin
     if (!user || user.role !== 'admin') {
       navigate('/');
       return;
     }
 
-    // If editing existing content, fetch it
     if (id) {
       fetchContent();
     }
@@ -117,7 +161,7 @@ const ContentEditor: React.FC = () => {
 
   const fetchContent = async () => {
     try {
-      const response = await fetch(`/api/content/${id}`, {
+      const response = await fetch(`/api/funding-calls/${id}`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
@@ -125,18 +169,61 @@ const ContentEditor: React.FC = () => {
       if (response.ok) {
         const data = await response.json();
         setFormData(data);
+      } else {
+        toast.error('Failed to fetch content');
       }
     } catch (error) {
       console.error('Error fetching content:', error);
-      setError('Failed to fetch content');
+      toast.error('Error loading content');
     }
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
+    if (name.includes('.')) {
+      const [section, field] = name.split('.');
+      setFormData(prev => ({
+        ...prev,
+        [section]: {
+          ...prev[section as keyof ContentData],
+          [field]: value
+        }
+      }));
+    } else {
+      setFormData(prev => ({
+        ...prev,
+        [name]: value
+      }));
+    }
+  };
+
+  const handleArrayChange = (section: 'eligibility', type: 'criteria' | 'ineligible', index: number, value: string) => {
     setFormData(prev => ({
       ...prev,
-      [name]: value
+      [section]: {
+        ...prev[section],
+        [type]: prev[section][type].map((item, i) => i === index ? value : item)
+      }
+    }));
+  };
+
+  const handleArrayAdd = (section: 'eligibility', type: 'criteria' | 'ineligible') => {
+    setFormData(prev => ({
+      ...prev,
+      [section]: {
+        ...prev[section],
+        [type]: [...prev[section][type], '']
+      }
+    }));
+  };
+
+  const handleArrayRemove = (section: 'eligibility', type: 'criteria' | 'ineligible', index: number) => {
+    setFormData(prev => ({
+      ...prev,
+      [section]: {
+        ...prev[section],
+        [type]: prev[section][type].filter((_, i) => i !== index)
+      }
     }));
   };
 
@@ -145,7 +232,19 @@ const ContentEditor: React.FC = () => {
     setError(null);
 
     try {
-      const url = id ? `/api/content/${id}` : '/api/content';
+      // Ensure fundingInfo is properly structured
+      const submissionData = {
+        ...formData,
+        fundingInfo: {
+          amount: formData.fundingInfo?.amount?.toString().replace(/^\$/, '') || '', // Remove $ if present
+          currency: formData.fundingInfo?.currency || 'USD',
+          duration: formData.fundingInfo?.duration?.toString() || '',
+          type: formData.fundingInfo?.type?.toString() || '',
+          budget_limit: formData.fundingInfo?.budget_limit?.toString() || ''
+        }
+      };
+
+      const url = id ? `/api/funding-calls/${id}` : '/api/funding-calls';
       const method = id ? 'PUT' : 'POST';
 
       const response = await fetch(url, {
@@ -154,24 +253,39 @@ const ContentEditor: React.FC = () => {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         },
-        body: JSON.stringify(formData)
+        body: JSON.stringify(submissionData)
       });
 
-      if (response.ok) {
-        navigate('/dashboard');
-      } else {
-        const data = await response.json();
-        setError(data.error || 'Failed to save content');
+      const data = await response.json();
+
+      if (!response.ok) {
+        const errorMessage = data.error || 'Failed to save content';
+        if (data.details) {
+          // Handle validation errors
+          const detailsStr = Object.entries(data.details)
+            .map(([field, msg]) => `${field}: ${msg}`)
+            .join(', ');
+          setError(`${errorMessage}: ${detailsStr}`);
+        } else {
+          setError(errorMessage);
+        }
+        toast.error(errorMessage);
+        return;
       }
-    } catch (error) {
+
+      toast.success(`Successfully ${id ? 'updated' : 'created'} content`);
+      navigate('/dashboard/content');
+    } catch (error: any) {
+      const errorMessage = error.message || 'Failed to save content';
       console.error('Error saving content:', error);
-      setError('Failed to save content');
+      setError(errorMessage);
+      toast.error(errorMessage);
     }
   };
 
   return (
     <EditorContainer>
-      <h1>{id ? 'Edit Content' : 'Create New Content'}</h1>
+      <h1>{id ? 'Edit Content' : `Create New ${formData.type.charAt(0).toUpperCase() + formData.type.slice(1)}`}</h1>
       {error && <ErrorMessage>{error}</ErrorMessage>}
       
       <Form onSubmit={handleSubmit}>
@@ -188,6 +302,18 @@ const ContentEditor: React.FC = () => {
         </FormGroup>
 
         <FormGroup>
+          <Label htmlFor="organization">Organization</Label>
+          <Input
+            type="text"
+            id="organization"
+            name="organization"
+            value={formData.organization}
+            onChange={handleChange}
+            required
+          />
+        </FormGroup>
+
+        <FormGroup>
           <Label htmlFor="description">Description</Label>
           <TextArea
             id="description"
@@ -198,13 +324,114 @@ const ContentEditor: React.FC = () => {
           />
         </FormGroup>
 
+        {(formData.type === 'grant' || formData.type === 'scholarship') && (
+          <>
+            <FormGroup>
+              <Label htmlFor="deadline">Deadline</Label>
+              <Input
+                type="date"
+                id="deadline"
+                name="deadline"
+                value={formData.deadline}
+                onChange={handleChange}
+                required
+              />
+            </FormGroup>
+
+            <FormGroup>
+              <Label htmlFor="fundingInfo.amount">Funding Amount</Label>
+              <Input
+                type="text"
+                id="fundingInfo.amount"
+                name="fundingInfo.amount"
+                value={formData.fundingInfo?.amount}
+                onChange={handleChange}
+                placeholder="e.g., 5000"
+              />
+            </FormGroup>
+
+            <FormGroup>
+              <Label htmlFor="fundingInfo.currency">Currency</Label>
+              <Select
+                id="fundingInfo.currency"
+                name="fundingInfo.currency"
+                value={formData.fundingInfo?.currency}
+                onChange={handleChange}
+              >
+                <option value="USD">USD</option>
+                <option value="EUR">EUR</option>
+                <option value="GBP">GBP</option>
+              </Select>
+            </FormGroup>
+          </>
+        )}
+
         <FormGroup>
-          <Label htmlFor="content">Content</Label>
-          <TextArea
-            id="content"
-            name="content"
-            value={formData.content}
+          <Label>Eligibility Criteria</Label>
+          {formData.eligibility.criteria.map((criterion, index) => (
+            <div key={index} style={{ display: 'flex', gap: '0.5rem' }}>
+              <Input
+                type="text"
+                value={criterion}
+                onChange={(e) => handleArrayChange('eligibility', 'criteria', index, e.target.value)}
+                placeholder="Enter eligibility criterion"
+                required
+              />
+              <Button
+                type="button"
+                className="secondary"
+                onClick={() => handleArrayRemove('eligibility', 'criteria', index)}
+              >
+                Remove
+              </Button>
+            </div>
+          ))}
+          <Button
+            type="button"
+            className="secondary"
+            onClick={() => handleArrayAdd('eligibility', 'criteria')}
+          >
+            Add Criterion
+          </Button>
+        </FormGroup>
+
+        <FormGroup>
+          <Label>Ineligible Criteria</Label>
+          {formData.eligibility.ineligible.map((criterion, index) => (
+            <div key={index} style={{ display: 'flex', gap: '0.5rem' }}>
+              <Input
+                type="text"
+                value={criterion}
+                onChange={(e) => handleArrayChange('eligibility', 'ineligible', index, e.target.value)}
+                placeholder="Enter ineligibility criterion"
+              />
+              <Button
+                type="button"
+                className="secondary"
+                onClick={() => handleArrayRemove('eligibility', 'ineligible', index)}
+              >
+                Remove
+              </Button>
+            </div>
+          ))}
+          <Button
+            type="button"
+            className="secondary"
+            onClick={() => handleArrayAdd('eligibility', 'ineligible')}
+          >
+            Add Ineligible Criterion
+          </Button>
+        </FormGroup>
+
+        <FormGroup>
+          <Label htmlFor="applicationUrl">Application URL</Label>
+          <Input
+            type="url"
+            id="applicationUrl"
+            name="applicationUrl"
+            value={formData.applicationUrl}
             onChange={handleChange}
+            placeholder="https://"
             required
           />
         </FormGroup>
@@ -217,19 +444,20 @@ const ContentEditor: React.FC = () => {
             value={formData.status}
             onChange={handleChange}
           >
-            <option value="draft">Draft</option>
-            <option value="published">Published</option>
+            <option value="open">Open</option>
+            <option value="closing_soon">Closing Soon</option>
+            <option value="closed">Closed</option>
           </Select>
         </FormGroup>
 
         <ButtonGroup>
           <Button type="submit" className="primary">
-            {id ? 'Update' : 'Create'} Content
+            {id ? 'Update' : 'Create'} {formData.type}
           </Button>
           <Button
             type="button"
             className="secondary"
-            onClick={() => navigate('/dashboard')}
+            onClick={() => navigate('/dashboard/content')}
           >
             Cancel
           </Button>

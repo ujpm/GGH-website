@@ -1,45 +1,44 @@
+import axios from 'axios';
 import { FundingCall, FundingFilters } from '../types/grants';
 
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+
 export async function getFundingCalls(filters?: FundingFilters): Promise<FundingCall[]> {
-  // TODO: Replace with actual API call
-  const response = await fetch('/api/funding-calls', {
-    method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(filters),
-  });
-  return response.json();
+  try {
+    const response = await axios.get(`${API_BASE_URL}/funding-calls`, { params: filters });
+    return response.data.calls || [];
+  } catch (error) {
+    console.error('Error fetching funding calls:', error);
+    return [];
+  }
 }
 
 export async function createFundingCall(call: Omit<FundingCall, 'id' | 'createdAt' | 'updatedAt'>): Promise<FundingCall> {
-  // TODO: Replace with actual API call
-  const response = await fetch('/api/funding-calls', {
-    method: 'POST',
+  const token = localStorage.getItem('token');
+  const response = await axios.post(`${API_BASE_URL}/funding-calls`, call, {
     headers: {
-      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
     },
-    body: JSON.stringify(call),
   });
-  return response.json();
+  return response.data;
 }
 
 export async function updateFundingCall(id: string, call: Partial<FundingCall>): Promise<FundingCall> {
-  // TODO: Replace with actual API call
-  const response = await fetch(`/api/funding-calls/${id}`, {
-    method: 'PUT',
+  const token = localStorage.getItem('token');
+  const response = await axios.put(`${API_BASE_URL}/funding-calls/${id}`, call, {
     headers: {
-      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
     },
-    body: JSON.stringify(call),
   });
-  return response.json();
+  return response.data;
 }
 
 export async function deleteFundingCall(id: string): Promise<void> {
-  // TODO: Replace with actual API call
-  await fetch(`/api/funding-calls/${id}`, {
-    method: 'DELETE',
+  const token = localStorage.getItem('token');
+  await axios.delete(`${API_BASE_URL}/funding-calls/${id}`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
   });
 }
 

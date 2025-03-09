@@ -3,6 +3,8 @@ import styled from 'styled-components';
 import { FundingCall, FundingType, FundingStatus } from '../../types/grants';
 import FundingCallCard from './FundingCallCard';
 import { useFunding } from '../../context/FundingContext';
+import { useAuth } from '../../context/AuthContext';
+import { deleteFundingCall } from '../../services/fundingService';
 
 const Container = styled.div`
   width: 100%;
@@ -239,7 +241,7 @@ const Pagination = styled.div`
   margin-top: 3rem;
 `;
 
-const PageButton = styled.button<{ active?: boolean; $type?: FundingType }>`
+const PaginationButton = styled.button<{ active?: boolean; $type?: FundingType }>`
   padding: 0.75rem 1.25rem;
   border: 2px solid ${props => props.active ? 
     props.$type === 'scholarship' ? '#3498DB' :
@@ -272,129 +274,148 @@ const PageButton = styled.button<{ active?: boolean; $type?: FundingType }>`
   }
 `;
 
+const PageInfo = styled.span`
+  font-size: 0.95rem;
+  color: #666;
+`;
+
 interface FundingCallsListProps {
   type?: FundingType;
   itemsPerPage?: number;
 }
 
 export default function FundingCallsList({ type, itemsPerPage = 9 }: FundingCallsListProps) {
-  const { state } = useFunding();
+  const { state, dispatch } = useFunding();
+  const { user } = useAuth();
+  const isAdmin = user?.role === 'admin';
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [filteredCalls, setFilteredCalls] = useState<FundingCall[]>([]);
   const [status, setStatus] = useState<FundingStatus | ''>('');
 
   useEffect(() => {
-    const filtered = state.calls.filter(call => {
-      const matchesSearch = !searchTerm || 
+    let filtered = state.calls.filter(call => !type || call.type === type);
+
+    if (searchTerm) {
+      filtered = filtered.filter(call => 
         call.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
         call.organization.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        call.description.toLowerCase().includes(searchTerm.toLowerCase());
+        call.description.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    }
 
-      const matchesType = !type || call.type === type;
-      const matchesStatus = !status || call.status === status;
-
-      return matchesSearch && matchesType && matchesStatus;
-    });
+    if (status) {
+      filtered = filtered.filter(call => call.status === status);
+    }
 
     setFilteredCalls(filtered);
-    setCurrentPage(1);
-  }, [state.calls, type, status, searchTerm]);
+    setCurrentPage(1); 
+  }, [state.calls, type, searchTerm, status]);
 
   const totalPages = Math.ceil(filteredCalls.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
-  const endIndex = startIndex + itemsPerPage;
-  const currentCalls = filteredCalls.slice(startIndex, endIndex);
+  const currentCalls = filteredCalls.slice(startIndex, startIndex + itemsPerPage);
 
-  const handleStatusChange = (value: string) => {
-    setStatus(value as FundingStatus);
+  const handleEdit = async (call: FundingCall) => {
+    if (!isAdmin) return;
+    window.location.href = `/dashboard/edit/${call.id}`;
   };
 
-  const clearFilters = () => {
-    setSearchTerm('');
-    setStatus('');
+  const handleDelete = async (id: string) => {
+    if (!isAdmin) return;
+    if (!window.confirm('Are you sure you want to delete this funding call?')) return;
+    
+    try {
+      await deleteFundingCall(id);
+      dispatch({ type: 'DELETE_CALL', payload: id });
+    } catch (error) {
+      console.error('Failed to delete funding call:', error);
+    }
   };
 
   if (state.error) {
     return <ErrorMessage>{state.error}</ErrorMessage>;
   }
 
+  if (state.loading) {
+    return <LoadingSpinner $type={type}>Loading...</LoadingSpinner>;
+  }
+
   return (
     <Container>
       <FiltersContainer $type={type}>
         <FilterGroup>
-          <Label $type={type}>Search:</Label>
+          <Label $type={type}>Search</Label>
           <SearchInput
             type="text"
+            placeholder="Search by title, organization..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            placeholder={`Search ${type || 'funding'} opportunities...`}
             $type={type}
           />
         </FilterGroup>
-
         <FilterGroup>
-          <Label $type={type}>Status:</Label>
+          <Label $type={type}>Status</Label>
           <Select
             value={status}
-            onChange={(e) => handleStatusChange(e.target.value)}
+            onChange={(e) => setStatus(e.target.value as FundingStatus)}
             $type={type}
           >
-            <option value="">All Status</option>
+            <option value="">All</option>
             <option value="open">Open</option>
             <option value="closing_soon">Closing Soon</option>
             <option value="closed">Closed</option>
           </Select>
         </FilterGroup>
-
-        <ClearFilters onClick={clearFilters} $type={type}>
-          Clear Filters
-        </ClearFilters>
+        {(searchTerm || status) && (
+          <ClearFilters $type={type} onClick={() => {
+            setSearchTerm('');
+            setStatus('');
+          }}>
+            Clear Filters
+          </ClearFilters>
+        )}
       </FiltersContainer>
 
-      {state.loading ? (
-        <LoadingSpinner $type={type}>Loading opportunities...</LoadingSpinner>
-      ) : currentCalls.length > 0 ? (
+      {currentCalls.length === 0 ? (
+        <NoResults $type={type}>
+          No {type || 'funding opportunities'} found matching your criteria.
+        </NoResults>
+      ) : (
         <>
           <Grid>
-            {currentCalls.map((call) => (
-              <FundingCallCard key={call.id} call={call} />
+            {currentCalls.map(call => (
+              <FundingCallCard 
+                key={call.id} 
+                call={call}
+                onEdit={isAdmin ? handleEdit : undefined}
+                onDelete={isAdmin ? handleDelete : undefined}
+              />
             ))}
           </Grid>
           
           {totalPages > 1 && (
             <Pagination>
-              <PageButton
-                onClick={() => setCurrentPage(p => p - 1)}
+              <PaginationButton
+                onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
                 disabled={currentPage === 1}
                 $type={type}
               >
                 Previous
-              </PageButton>
-              {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
-                <PageButton
-                  key={page}
-                  active={page === currentPage}
-                  onClick={() => setCurrentPage(page)}
-                  $type={type}
-                >
-                  {page}
-                </PageButton>
-              ))}
-              <PageButton
-                onClick={() => setCurrentPage(p => p + 1)}
+              </PaginationButton>
+              <PageInfo>
+                Page {currentPage} of {totalPages}
+              </PageInfo>
+              <PaginationButton
+                onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
                 disabled={currentPage === totalPages}
                 $type={type}
               >
                 Next
-              </PageButton>
+              </PaginationButton>
             </Pagination>
           )}
         </>
-      ) : (
-        <NoResults $type={type}>
-          No {type || 'funding'} opportunities found. Try adjusting your filters or search terms.
-        </NoResults>
       )}
     </Container>
   );

@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { AuthRequest } from '../middleware/auth';
-import FundingCall from '../models/FundingCall';
+import FundingCall from '../src/models/FundingCall';
 
 // Get all funding calls with filtering
 export const getFundingCalls = async (req: Request, res: Response) => {
@@ -16,6 +16,8 @@ export const getFundingCalls = async (req: Request, res: Response) => {
       sortOrder = 'asc'
     } = req.query;
 
+    console.log(' Fetching funding calls with filters:', { type, status, featured, search });
+
     const query: any = {};
     
     // Apply filters
@@ -27,6 +29,8 @@ export const getFundingCalls = async (req: Request, res: Response) => {
     if (search) {
       query.$text = { $search: search as string };
     }
+
+    console.log(' MongoDB query:', JSON.stringify(query, null, 2));
 
     // Calculate pagination
     const skip = (Number(page) - 1) * Number(limit);
@@ -44,19 +48,24 @@ export const getFundingCalls = async (req: Request, res: Response) => {
       FundingCall.countDocuments(query)
     ]);
 
+    console.log(` Found ${total} total calls, returning ${calls.length} calls`);
+
     // Update status based on deadline for all calls
     const updatedCalls = calls.map(call => {
       const now = new Date();
       const deadline = new Date(call.deadline);
       const daysUntilDeadline = Math.ceil((deadline.getTime() - now.getTime()) / (1000 * 3600 * 24));
 
+      let status = call.status;
       if (daysUntilDeadline <= 0) {
-        call.status = 'closed';
+        status = 'closed';
       } else if (daysUntilDeadline <= 7) {
-        call.status = 'closing_soon';
+        status = 'closing_soon';
+      } else {
+        status = 'open';
       }
 
-      return call;
+      return { ...call, status };
     });
 
     return res.json({
@@ -69,7 +78,7 @@ export const getFundingCalls = async (req: Request, res: Response) => {
       }
     });
   } catch (error) {
-    console.error('Error fetching funding calls:', error);
+    console.error(' Error fetching funding calls:', error);
     return res.status(500).json({ error: 'Failed to fetch funding calls' });
   }
 };
@@ -91,16 +100,40 @@ export const getFundingCall = async (req: Request, res: Response) => {
 // Create a new funding call
 export const createFundingCall = async (req: AuthRequest, res: Response) => {
   try {
+    // Ensure fundingInfo has all required fields with defaults
+    const fundingInfo = {
+      amount: (req.body.fundingInfo?.amount || '').toString().replace(/^\$/, ''), // Remove $ if present
+      currency: req.body.fundingInfo?.currency || 'USD',
+      duration: (req.body.fundingInfo?.duration || '').toString(),
+      type: (req.body.fundingInfo?.type || '').toString(),
+      budget_limit: (req.body.fundingInfo?.budget_limit || '').toString()
+    };
+
+    const { fundingInfo: _, ...otherData } = req.body;
+    
     const newCall = new FundingCall({
-      ...req.body,
+      ...otherData,
+      fundingInfo,
       publishedAt: new Date()
     });
 
-    await newCall.save();
-    return res.status(201).json(newCall);
-  } catch (error) {
-    console.error('Error creating funding call:', error);
-    return res.status(500).json({ error: 'Failed to create funding call' });
+    const savedCall = await newCall.save();
+    return res.status(201).json(savedCall);
+  } catch (error: any) {
+    console.warn('Error creating funding call:', error);
+    // Return detailed validation errors if available
+    if (error.name === 'ValidationError') {
+      return res.status(400).json({ 
+        error: 'Validation failed',
+        details: Object.keys(error.errors).reduce((acc, key) => {
+          acc[key] = error.errors[key].message;
+          return acc;
+        }, {} as Record<string, string>)
+      });
+    }
+    return res.status(500).json({ 
+      error: `Error creating funding call: ${error.message}`
+    });
   }
 };
 
@@ -175,7 +208,7 @@ export const getFundingStats = async (_req: Request, res: Response) => {
 
     return res.json(stats[0]);
   } catch (error) {
-    console.error('Error fetching funding stats:', error);
-    return res.status(500).json({ error: 'Failed to fetch funding statistics' });
+    console.error('Error getting funding stats:', error);
+    return res.status(500).json({ error: 'Failed to get funding stats' });
   }
 };

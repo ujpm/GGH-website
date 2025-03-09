@@ -1,35 +1,31 @@
 import mongoose, { Schema, Document } from 'mongoose';
 
-export interface IEligibility {
-  criteria: string[];
-  ineligible: string[];
+interface IFundingInfo {
+  amount: string;
+  currency: string;
+  duration: string;
+  type: string;
+  budget_limit: string;
 }
 
-export interface IFundingInfo {
-  amount?: string;
-  currency?: string;
-  duration?: string;
-  type?: string;
-  budget_limit?: string;
-}
-
-export interface IContact {
-  name?: string;
-  email?: string;
-  phone?: string;
-  website?: string;
-}
-
-export interface IFundingCall extends Document {
+interface IFundingCall extends Document {
   title: string;
   type: 'grant' | 'scholarship' | 'resource';
   organization: string;
   description: string;
   deadline: Date;
   status: 'open' | 'closing_soon' | 'closed';
-  eligibility: IEligibility;
+  eligibility: {
+    criteria: string[];
+    ineligible: string[];
+  };
   fundingInfo: IFundingInfo;
-  contact: IContact;
+  contact: {
+    name?: string;
+    email?: string;
+    phone?: string;
+    website?: string;
+  };
   applicationUrl: string;
   featured: boolean;
   tags: string[];
@@ -55,30 +51,31 @@ const FundingCallSchema = new Schema({
     default: 'open'
   },
   eligibility: {
-    criteria: [String],
-    ineligible: [String]
+    criteria: [{ type: String }],
+    ineligible: [{ type: String }]
   },
   fundingInfo: {
-    amount: String,
-    currency: String,
-    duration: String,
-    type: String,
-    budget_limit: String
+    amount: { type: String, default: '' },
+    currency: { type: String, enum: ['USD', 'EUR', 'GBP'], default: 'USD' },
+    duration: { type: String, default: '' },
+    type: { type: String, default: '' },
+    budget_limit: { type: String, default: '' }
   },
   contact: {
-    name: String,
-    email: String,
-    phone: String,
-    website: String
+    name: { type: String },
+    email: { type: String },
+    phone: { type: String },
+    website: { type: String }
   },
   applicationUrl: { type: String, required: true },
   featured: { type: Boolean, default: false },
-  tags: [String],
+  tags: [{ type: String }],
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now },
   publishedAt: { type: Date }
 }, {
-  timestamps: true
+  timestamps: true,
+  strict: true
 });
 
 // Add text indexes for search functionality
