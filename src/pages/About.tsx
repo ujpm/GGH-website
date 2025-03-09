@@ -1,9 +1,9 @@
 import styled from 'styled-components';
 import Team from '../components/about/Team';
-import logoTransparent from 'assets/logo_transparent.png';
-import helpingOrgs from 'assets/helping-organizations.jpeg';
-import gghMeeting from 'assets/GGH-meeting.png';
-import growing from 'assets/growing.jpg';
+import logoTransparent from '../assets/logo_transparent.png';
+import helpingOrgs from '../assets/helping-organizations.jpeg';
+import gghMeeting from '../assets/GGH-meeting.png';
+import growing from '../assets/growing.jpg';
 
 // Add interface for components with reverse prop
 interface ReverseProps {
@@ -264,13 +264,17 @@ const About = () => {
               a deep passion for empowering communities and driving sustainable development. 
               Richardson's journey began in 2002 with World Vision Uganda in Rakai District, during his 
               extensive work with various non-governmental organizations (NGOs) and civil society 
-              organizations (CSOs).
+              organizations (CSOs). Through these experiences, he witnessed firsthand the challenges these 
+              organizations faced in securing funding and accessing resources to implement their impactful 
+              projects.
             </p>
             <p>
               Having become an orphan at the age of 9 months, Richardson personally understood the need 
               on the ground to empower lives and create opportunities for those in need. His dedication to 
               making a difference in the world was ignited during his involvement in grassroots initiatives, 
-              where he saw the transformative power of collaboration and innovation.
+              where he saw the transformative power of collaboration and innovation. He recognized that 
+              many organizations, despite their potential and commitment, struggled to navigate the 
+              complex landscape of grant applications and funding opportunities.
             </p>
           </StoryContent>
           <StoryImage>
@@ -309,10 +313,11 @@ const About = () => {
               perseverance, and the belief that by working together, we can achieve remarkable things.
             </p>
             <p>
-              Through our platform, countless organizations have secured funding, implemented life-changing 
-              projects, and created lasting impact in their communities. We continue to grow and expand 
-              our services, always guided by our core mission of empowering those who are working to 
-              make the world a better place.
+              Richardson holds a Master's Degree in Business Administration and a Bachelor of 
+              Arts in Development Studies and Administration. His academic journey provided him with a 
+              strong foundation in strategic planning, resource allocation, and business administration. 
+              Additionally, he has earned several certificates in grant application writing, leadership 
+              management, and legal empowerment, further enhancing his expertise.
             </p>
           </StoryContent>
           <StoryImage>
@@ -320,37 +325,42 @@ const About = () => {
           </StoryImage>
         </StorySection>
 
-        <SectionTitle>What We Do</SectionTitle>
+        <SectionTitle>Professional Achievements</SectionTitle>
         <ServicesGrid>
           <ServiceCard>
-            <h3>Daily Updates</h3>
+            <h3>Professional Affiliations</h3>
             <p>
-              Stay informed with the latest funding opportunities, donor calls, and
-              relevant resources to keep you ahead in your funding journey.
+              Active member of the NESS Science Research Network Uganda and the International 
+              Baccalaureate World Schools Association. Executive board member of Corporate Consultants 
+              International. CEO of CYEI - Cairo Youth Empowerment Initiative, and COO of Mission of 
+              Hope Initiative (MOHI).
             </p>
           </ServiceCard>
 
           <ServiceCard>
-            <h3>Grant Application Support</h3>
+            <h3>Notable Achievements</h3>
             <p>
-              We offer expertise in grant writing, proposal drafting, and strategic
-              planning, ensuring you have the best chance of securing funding.
+              Successfully secured a $1.5M USD grant for a refugee project in the Kyaka II refugee 
+              settlement. Demonstrated expertise in grant writing, strategic planning, and project 
+              management across various initiatives from youth empowerment to community development.
             </p>
           </ServiceCard>
 
           <ServiceCard>
-            <h3>Networking</h3>
+            <h3>Leadership & Vision</h3>
             <p>
-              Connect with a diverse network of professionals and organizations,
-              fostering collaboration and sharing of resources.
+              Known to many as Chief, Richardson's leadership has transformed the Global Grants Hub 
+              into a beacon of support for organizations worldwide. His personal journey and unwavering 
+              commitment continue to inspire and guide the organization's mission.
             </p>
           </ServiceCard>
 
           <ServiceCard>
-            <h3>Workshops and Training</h3>
+            <h3>Impact & Legacy</h3>
             <p>
-              Enhance your skills and knowledge through regular workshops and
-              training sessions designed to build capacity.
+              Through mentorship, training, and resource sharing, the Hub has become an essential 
+              platform for organizations and individuals striving to make a difference, creating lasting 
+              impact in communities worldwide.
             </p>
           </ServiceCard>
         </ServicesGrid>

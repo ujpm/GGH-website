@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import styled from 'styled-components';
 import { TeamMember as TeamMemberType } from '../../types/team';
-import { FaLinkedin, FaTwitter, FaEnvelope, FaPhone, FaWhatsapp } from 'react-icons/fa';
+import { FaLinkedin, FaTwitter, FaEnvelope, FaPhone, FaWhatsapp, FaFacebook, FaGlobeAfrica, FaGithub} from 'react-icons/fa';
 
 const Card = styled.div`
   position: relative;
@@ -192,6 +192,21 @@ const TeamMember: React.FC<Props> = ({ member }) => {
           {member.socials.linkedin && (
             <SocialIcon href={member.socials.linkedin} target="_blank" rel="noopener noreferrer">
               <FaLinkedin />
+            </SocialIcon>
+          )}
+          {member.socials.facebook && (
+            <SocialIcon href={member.socials.facebook} target="_blank" rel="noopener noreferrer">
+              <FaFacebook />
+            </SocialIcon>
+          )}
+          {member.socials.globeAfrica && (
+            <SocialIcon href={member.socials.globeAfrica} target="_blank" rel="noopener noreferrer">
+              <FaGlobeAfrica />
+            </SocialIcon>
+          )}
+          {member.socials.github && (
+            <SocialIcon href={member.socials.github} target="_blank" rel="noopener noreferrer">
+              <FaGithub />
             </SocialIcon>
           )}
           {member.socials.twitter && (

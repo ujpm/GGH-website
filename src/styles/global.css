@@ -3,6 +3,7 @@
   --primary: #E63946;
   --primary-dark: #A4161A;
   --secondary: #1D3557;
+  --secondary-dark: #152538;
   --soft-peach: #F8E1DC;
   --dark-crimson: #A4161A;
   --background: #FFFFFF;
@@ -12,7 +13,8 @@
   --text-light: #757575;
   
   /* Gradients */
-  --gradient-primary: linear-gradient(135deg, #E63946 0%, #1D3557 100%);
+  --gradient-primary: linear-gradient(135deg, var(--secondary) 0%, var(--secondary-dark) 100%);
+  --gradient-accent: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
 }
 
 * {

@@ -12,5 +12,8 @@ export interface TeamMember {
     socials: {
         linkedin?: string;
         twitter?: string;
+        facebook?: string;
+        globeAfrica?: string;
+        github?: string;
     };
 }
