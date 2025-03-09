@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { GoogleLogin } from '@react-oauth/google';
 
@@ -69,6 +69,31 @@ const ErrorMessage = styled.div`
   text-align: center;
 `;
 
+const LinkText = styled(Link)`
+  color: var(--color-primary);
+  text-decoration: none;
+  text-align: center;
+  margin-top: 1rem;
+  display: block;
+
+  &:hover {
+    text-decoration: underline;
+  }
+`;
+
+const GoogleContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  margin-top: 1rem;
+`;
+
+const PasswordRequirements = styled.ul`
+  font-size: 0.85rem;
+  color: #666;
+  margin: 0.5rem 0;
+  padding-left: 1.2rem;
+`;
+
 const Register: React.FC = () => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -118,7 +143,7 @@ const Register: React.FC = () => {
 
   return (
     <RegisterContainer>
-      <h2>Register</h2>
+      <h2>Create an Account</h2>
       {(error || validationError) && (
         <ErrorMessage>{error || validationError}</ErrorMessage>
       )}
@@ -144,6 +169,10 @@ const Register: React.FC = () => {
           onChange={(e) => setPassword(e.target.value)}
           required
         />
+        <PasswordRequirements>
+          <li>At least 6 characters long</li>
+          <li>Mix of letters, numbers, and symbols recommended</li>
+        </PasswordRequirements>
         <Input
           type="password"
           placeholder="Confirm Password"
@@ -152,7 +181,7 @@ const Register: React.FC = () => {
           required
         />
         <Button type="submit" disabled={isLoading}>
-          {isLoading ? 'Loading...' : 'Register'}
+          {isLoading ? 'Creating Account...' : 'Create Account'}
         </Button>
       </Form>
 
@@ -160,10 +189,19 @@ const Register: React.FC = () => {
         <span>OR</span>
       </Divider>
 
-      <GoogleLogin
-        onSuccess={handleGoogleSuccess}
-        onError={() => console.log('Login Failed')}
-      />
+      <GoogleContainer>
+        <GoogleLogin
+          onSuccess={handleGoogleSuccess}
+          onError={() => console.log('Registration Failed')}
+          text="signup_with"
+          shape="rectangular"
+          theme="filled_blue"
+        />
+      </GoogleContainer>
+
+      <LinkText to="/login">
+        Already have an account? Login here
+      </LinkText>
     </RegisterContainer>
   );
 };

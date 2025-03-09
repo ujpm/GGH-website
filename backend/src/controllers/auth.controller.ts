@@ -11,7 +11,7 @@ export const register = async (
   next: NextFunction
 ): Promise<void> => {
   try {
-    console.log('Register attempt:', req.body);
+    console.log('Register attempt:', { email: req.body.email, name: req.body.name });
     const { email, password, name } = req.body;
 
     // Check if user exists
@@ -27,12 +27,13 @@ export const register = async (
       email,
       password,
       name,
+      role: 'user', // Default role
     });
     console.log('User created successfully:', { id: user._id, email: user.email });
 
     // Generate token
     const token = jwt.sign(
-      { userId: user._id },
+      { userId: user._id, role: user.role },
       process.env.JWT_SECRET!,
       { expiresIn: '1d' }
     );
@@ -46,6 +47,7 @@ export const register = async (
           email: user.email,
           name: user.name,
           role: user.role,
+          avatar: user.avatar,
         },
       },
     });
@@ -61,14 +63,21 @@ export const login = async (
   next: NextFunction
 ): Promise<void> => {
   try {
-    console.log('Login attempt:', req.body);
+    console.log('Login attempt:', { email: req.body.email });
     const { email, password } = req.body;
 
-    // Check if user exists
+    // Check if user exists and include password for comparison
     const user = await User.findOne({ email }).select('+password');
     if (!user) {
       console.log('Login failed: User not found');
       res.status(401).json({ message: 'Invalid credentials' });
+      return;
+    }
+
+    // For users created via Google OAuth
+    if (!user.password) {
+      console.log('Login failed: Account requires Google authentication');
+      res.status(401).json({ message: 'Please login with Google' });
       return;
     }
 
@@ -80,11 +89,11 @@ export const login = async (
       return;
     }
 
-    console.log('Login successful:', { id: user._id, email: user.email });
+    console.log('Login successful:', { id: user._id, email: user.email, role: user.role });
 
-    // Generate token
+    // Generate token with role
     const token = jwt.sign(
-      { userId: user._id },
+      { userId: user._id, role: user.role },
       process.env.JWT_SECRET!,
       { expiresIn: '1d' }
     );
@@ -98,6 +107,7 @@ export const login = async (
           email: user.email,
           name: user.name,
           role: user.role,
+          avatar: user.avatar,
         },
       },
     });
@@ -127,21 +137,32 @@ export const googleAuth = async (
 
     // Find or create user
     let user = await User.findOne({ email });
+    
     if (!user) {
+      // Check if this is the admin email
+      const isAdminEmail = email === process.env.ADMIN_EMAIL;
+      
       user = await User.create({
         email,
         name,
         googleId,
         avatar: picture,
+        role: isAdminEmail ? 'admin' : 'user', // Set admin role if matches admin email
       });
-      console.log('New user created from Google auth:', { id: user._id, email: user.email });
+      console.log('New user created from Google auth:', { id: user._id, email: user.email, role: user.role });
     } else {
-      console.log('Existing user found from Google auth:', { id: user._id, email: user.email });
+      // Update existing user's Google ID if not set
+      if (!user.googleId) {
+        user.googleId = googleId;
+        user.avatar = picture;
+        await user.save();
+      }
+      console.log('Existing user found from Google auth:', { id: user._id, email: user.email, role: user.role });
     }
 
-    // Generate token
+    // Generate token with role
     const jwtToken = jwt.sign(
-      { userId: user._id },
+      { userId: user._id, role: user.role },
       process.env.JWT_SECRET!,
       { expiresIn: '1d' }
     );
@@ -155,11 +176,50 @@ export const googleAuth = async (
           email: user.email,
           name: user.name,
           role: user.role,
+          avatar: user.avatar,
         },
       },
     });
   } catch (error) {
     console.error('Google auth error:', error);
+    next(error);
+  }
+};
+
+// Get current user
+export const getCurrentUser = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const token = req.headers.authorization?.split(' ')[1];
+    
+    if (!token) {
+      res.status(401).json({ message: 'No token provided' });
+      return;
+    }
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET!) as { userId: string };
+    const user = await User.findById(decoded.userId);
+
+    if (!user) {
+      res.status(404).json({ message: 'User not found' });
+      return;
+    }
+
+    res.json({
+      success: true,
+      data: {
+        id: user._id,
+        email: user.email,
+        name: user.name,
+        role: user.role,
+        avatar: user.avatar,
+      },
+    });
+  } catch (error) {
+    console.error('Get current user error:', error);
     next(error);
   }
 };

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
-import { FundingCall, FundingType } from '../../types/grants';
+import { FundingCall, FundingType, FundingStatus } from '../../types/grants';
 import { validateFundingCall } from '../../services/fundingService';
 import { useFunding } from '../../context/FundingContext';
 
@@ -121,16 +121,19 @@ const ArrayInput = styled.div`
 
 interface FundingCallFormProps {
   initialData?: FundingCall;
-  onSubmit: (data: Omit<FundingCall, 'id' | 'createdAt' | 'updatedAt'>) => void;
+  onSubmit: (data: Omit<FundingCall, 'id' | 'createdAt' | 'updatedAt'>) => Promise<FundingCall>;
 }
 
 export default function FundingCallForm({ initialData, onSubmit }: FundingCallFormProps) {
-  const [formData, setFormData] = useState({
+  const { dispatch } = useFunding();
+  const [formData, setFormData] = useState<Omit<FundingCall, 'id' | 'createdAt' | 'updatedAt'>>({
     title: '',
     type: 'grant' as FundingType,
     organization: '',
     description: '',
     deadline: '',
+    status: 'open' as FundingStatus,
+    publishedAt: new Date().toISOString(),
     eligibility: {
       criteria: [''],
       ineligible: [''],
@@ -151,6 +154,24 @@ export default function FundingCallForm({ initialData, onSubmit }: FundingCallFo
 
   const [errors, setErrors] = useState<string[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  useEffect(() => {
+    if (initialData) {
+      setFormData(prev => ({
+        ...prev,
+        ...initialData,
+      }));
+    }
+  }, [initialData]);
+
+  useEffect(() => {
+    const validationErrors = validateFundingCall(formData);
+    if (validationErrors.length > 0) {
+      setErrors(validationErrors);
+    } else {
+      setErrors([]);
+    }
+  }, [formData]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -205,9 +226,16 @@ export default function FundingCallForm({ initialData, onSubmit }: FundingCallFo
     }
 
     try {
-      await onSubmit(formData);
+      const savedData = await onSubmit(formData);
+      // Only dispatch if we have a complete FundingCall with ID
+      if ('id' in savedData) {
+        dispatch({ 
+          type: initialData ? 'UPDATE_CALL' : 'ADD_CALL', 
+          payload: savedData as FundingCall 
+        });
+      }
     } catch (error) {
-      setErrors(['Failed to save funding call. Please try again.']);
+      setErrors(['Failed to save funding call']);
     } finally {
       setIsSubmitting(false);
     }
@@ -266,6 +294,14 @@ export default function FundingCallForm({ initialData, onSubmit }: FundingCallFo
           onChange={handleChange}
           required
         />
+      </FormGroup>
+
+      <FormGroup>
+        <Label>Status</Label>
+        <Select name="status" value={formData.status} onChange={handleChange} required>
+          <option value="open">Open</option>
+          <option value="closed">Closed</option>
+        </Select>
       </FormGroup>
 
       <FormGroup>
@@ -367,6 +403,17 @@ export default function FundingCallForm({ initialData, onSubmit }: FundingCallFo
           value={formData.applicationUrl}
           onChange={handleChange}
           placeholder="Enter application URL"
+          required
+        />
+      </FormGroup>
+
+      <FormGroup>
+        <Label>Published At</Label>
+        <Input
+          type="datetime-local"
+          name="publishedAt"
+          value={formData.publishedAt}
+          onChange={handleChange}
           required
         />
       </FormGroup>

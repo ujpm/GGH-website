@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useReducer, useEffect } from 'react';
-import { FundingCall, FundingFilters, FundingType, FundingStatus } from '../types/grants';
+import { FundingCall, FundingFilters, FundingStatus } from '../types/grants';
 
 interface FundingState {
   calls: FundingCall[];
@@ -94,8 +94,24 @@ export function FundingProvider({ children }: { children: React.ReactNode }) {
     return () => clearInterval(interval);
   }, [state.calls]);
 
+  // Filter calls based on current filters
+  const filteredCalls = state.calls.filter(call => {
+    const { type, status, featured, tags } = state.filters;
+    
+    // Type-safe filtering using the FundingCall type definition
+    const typeMatches = !type || call.type === type;
+    const statusMatches = !status || call.status === status;
+    const featuredMatches = featured === undefined || call.featured === featured;
+    const tagsMatch = !tags?.length || tags.some(tag => call.tags?.includes(tag));
+    
+    return typeMatches && statusMatches && featuredMatches && tagsMatch;
+  });
+
   return (
-    <FundingContext.Provider value={{ state, dispatch }}>
+    <FundingContext.Provider value={{ 
+      state: { ...state, calls: filteredCalls },
+      dispatch 
+    }}>
       {children}
     </FundingContext.Provider>
   );

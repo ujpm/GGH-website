@@ -6,8 +6,8 @@ import {
   updateFundingCall,
   deleteFundingCall,
   getFundingStats
-} from '../controllers/fundingController';
-import { isAdmin } from '../middleware/auth';
+} from '../../controllers/fundingController';
+import { isAdmin } from '../../middleware/auth';
 
 const router = express.Router();
 

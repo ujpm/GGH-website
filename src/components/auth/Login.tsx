@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { GoogleLogin } from '@react-oauth/google';
 
@@ -69,6 +69,24 @@ const ErrorMessage = styled.div`
   text-align: center;
 `;
 
+const LinkText = styled(Link)`
+  color: var(--color-primary);
+  text-decoration: none;
+  text-align: center;
+  margin-top: 1rem;
+  display: block;
+
+  &:hover {
+    text-decoration: underline;
+  }
+`;
+
+const GoogleContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  margin-top: 1rem;
+`;
+
 const Login: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -126,10 +144,19 @@ const Login: React.FC = () => {
         <span>OR</span>
       </Divider>
 
-      <GoogleLogin
-        onSuccess={handleGoogleSuccess}
-        onError={() => console.log('Login Failed')}
-      />
+      <GoogleContainer>
+        <GoogleLogin
+          onSuccess={handleGoogleSuccess}
+          onError={() => console.log('Login Failed')}
+          text="signin_with"
+          shape="rectangular"
+          theme="filled_blue"
+        />
+      </GoogleContainer>
+
+      <LinkText to="/register">
+        Don't have an account? Register here
+      </LinkText>
     </LoginContainer>
   );
 };

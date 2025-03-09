@@ -4,7 +4,7 @@ import { QueryClient, QueryClientProvider } from 'react-query';
 import { Toaster } from 'react-hot-toast';
 import { AuthProvider } from './context/AuthContext';
 import { FundingProvider } from './context/FundingContext';
-import ProtectedRoute from './components/auth/ProtectedRoute';
+import AdminRoute from './components/auth/AdminRoute';
 import Navbar from './components/common/Navbar';
 import Footer from './components/common/Footer';
 import Home from './pages/Home';
@@ -12,7 +12,10 @@ import About from './pages/About';
 import Login from './components/auth/Login';
 import Register from './components/auth/Register';
 import Unauthorized from './pages/Unauthorized';
-import Dashboard from './pages/Dashboard';
+import DashboardLayout from './components/dashboard/DashboardLayout';
+import DashboardOverview from './components/dashboard/DashboardOverview';
+import ContentManagement from './components/dashboard/ContentManagement';
+import ContentEditor from './components/dashboard/ContentEditor';
 import Grants from './pages/Grants';
 import ManageFunding from './pages/admin/ManageFunding';
 
@@ -28,6 +31,7 @@ function App() {
               <div className="App">
                 <Navbar />
                 <Routes>
+                  {/* Public Routes */}
                   <Route path="/" element={<Home />} />
                   <Route path="/about" element={<About />} />
                   <Route path="/login" element={<Login />} />
@@ -39,21 +43,28 @@ function App() {
                   <Route path="/scholarships" element={<Grants type="scholarship" />} />
                   <Route path="/resources" element={<Grants type="resource" />} />
                   
-                  {/* Protected Routes */}
+                  {/* Admin Dashboard Routes */}
                   <Route
                     path="/dashboard"
                     element={
-                      <ProtectedRoute>
-                        <Dashboard />
-                      </ProtectedRoute>
+                      <AdminRoute>
+                        <DashboardLayout />
+                      </AdminRoute>
                     }
-                  />
+                  >
+                    <Route index element={<DashboardOverview />} />
+                    <Route path="content" element={<ContentManagement />} />
+                    <Route path="create" element={<ContentEditor />} />
+                    <Route path="edit/:id" element={<ContentEditor />} />
+                  </Route>
+
+                  {/* Legacy Admin Routes - To be migrated */}
                   <Route
                     path="/admin/manage-funding"
                     element={
-                      <ProtectedRoute>
+                      <AdminRoute>
                         <ManageFunding />
-                      </ProtectedRoute>
+                      </AdminRoute>
                     }
                   />
                 </Routes>

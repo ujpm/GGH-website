@@ -1,4 +1,4 @@
-import { FundingCall, FundingFilters, FundingType } from '../types/grants';
+import { FundingCall, FundingFilters } from '../types/grants';
 
 export async function getFundingCalls(filters?: FundingFilters): Promise<FundingCall[]> {
   // TODO: Replace with actual API call

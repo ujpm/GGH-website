@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
-import FundingCall, { IFundingCall } from '../models/FundingCall';
+import { AuthRequest } from '../middleware/auth';
+import FundingCall from '../models/FundingCall';
 
 // Get all funding calls with filtering
 export const getFundingCalls = async (req: Request, res: Response) => {
@@ -58,7 +59,7 @@ export const getFundingCalls = async (req: Request, res: Response) => {
       return call;
     });
 
-    res.json({
+    return res.json({
       calls: updatedCalls,
       pagination: {
         total,
@@ -69,7 +70,7 @@ export const getFundingCalls = async (req: Request, res: Response) => {
     });
   } catch (error) {
     console.error('Error fetching funding calls:', error);
-    res.status(500).json({ error: 'Failed to fetch funding calls' });
+    return res.status(500).json({ error: 'Failed to fetch funding calls' });
   }
 };
 
@@ -80,15 +81,15 @@ export const getFundingCall = async (req: Request, res: Response) => {
     if (!call) {
       return res.status(404).json({ error: 'Funding call not found' });
     }
-    res.json(call);
+    return res.json(call);
   } catch (error) {
     console.error('Error fetching funding call:', error);
-    res.status(500).json({ error: 'Failed to fetch funding call' });
+    return res.status(500).json({ error: 'Failed to fetch funding call' });
   }
 };
 
 // Create a new funding call
-export const createFundingCall = async (req: Request, res: Response) => {
+export const createFundingCall = async (req: AuthRequest, res: Response) => {
   try {
     const newCall = new FundingCall({
       ...req.body,
@@ -96,15 +97,15 @@ export const createFundingCall = async (req: Request, res: Response) => {
     });
 
     await newCall.save();
-    res.status(201).json(newCall);
+    return res.status(201).json(newCall);
   } catch (error) {
     console.error('Error creating funding call:', error);
-    res.status(500).json({ error: 'Failed to create funding call' });
+    return res.status(500).json({ error: 'Failed to create funding call' });
   }
 };
 
 // Update a funding call
-export const updateFundingCall = async (req: Request, res: Response) => {
+export const updateFundingCall = async (req: AuthRequest, res: Response) => {
   try {
     const call = await FundingCall.findByIdAndUpdate(
       req.params.id,
@@ -116,29 +117,29 @@ export const updateFundingCall = async (req: Request, res: Response) => {
       return res.status(404).json({ error: 'Funding call not found' });
     }
 
-    res.json(call);
+    return res.json(call);
   } catch (error) {
     console.error('Error updating funding call:', error);
-    res.status(500).json({ error: 'Failed to update funding call' });
+    return res.status(500).json({ error: 'Failed to update funding call' });
   }
 };
 
 // Delete a funding call
-export const deleteFundingCall = async (req: Request, res: Response) => {
+export const deleteFundingCall = async (req: AuthRequest, res: Response) => {
   try {
     const call = await FundingCall.findByIdAndDelete(req.params.id);
     if (!call) {
       return res.status(404).json({ error: 'Funding call not found' });
     }
-    res.status(204).send();
+    return res.status(204).send();
   } catch (error) {
     console.error('Error deleting funding call:', error);
-    res.status(500).json({ error: 'Failed to delete funding call' });
+    return res.status(500).json({ error: 'Failed to delete funding call' });
   }
 };
 
 // Get funding call statistics
-export const getFundingStats = async (req: Request, res: Response) => {
+export const getFundingStats = async (_req: Request, res: Response) => {
   try {
     const stats = await FundingCall.aggregate([
       {
@@ -172,9 +173,9 @@ export const getFundingStats = async (req: Request, res: Response) => {
       }
     ]);
 
-    res.json(stats[0]);
+    return res.json(stats[0]);
   } catch (error) {
     console.error('Error fetching funding stats:', error);
-    res.status(500).json({ error: 'Failed to fetch funding statistics' });
+    return res.status(500).json({ error: 'Failed to fetch funding statistics' });
   }
 };

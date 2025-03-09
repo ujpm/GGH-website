@@ -1,6 +1,5 @@
-import React from 'react';
-import styled from 'styled-components';
 import { FundingCall } from '../../types/grants';
+import styled from 'styled-components';
 import { format } from 'date-fns';
 
 const Card = styled.div<{ type: string }>`
