@@ -92,7 +92,7 @@ const teamMembers: TeamMemberType[] = [
   {
     id: 2,
     name: "RSU. Dr. Mubiru Moses Batanda, PhD",
-    role: "Advisor",
+    role: "Hon. Advisor",
     bio: "Dr. Moses Batanda Mubiru is a distinguished academic, researcher, and consultant specializing in Housing, Valuation, Land Management, and Real Estate. He holds a PhD in Housing and Human Settlement Studies, as well as an MSc in Real Estate and an MBA in Investment Management. Dr. Mubiru is a Lecturer at Kyambogo University and the Managing Director at Whiteknights Valuers, a professional valuation surveying and property management company. His extensive research and teaching experience have significantly contributed to the field, making him a valuable addition to the Global Grants Hub team.",
     image: logo,
     contacts: {
