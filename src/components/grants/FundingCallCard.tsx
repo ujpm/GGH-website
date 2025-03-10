@@ -2,6 +2,8 @@ import { FundingCall } from '../../types/grants';
 import styled from 'styled-components';
 import { format } from 'date-fns';
 import { useAuth } from '../../context/AuthContext';
+import { useState } from 'react';
+import FundingCallDetail from './FundingCallDetail';
 
 const Card = styled.div<{ type: string }>`
   background: white;
@@ -249,53 +251,66 @@ interface FundingCallCardProps {
   onDelete?: (id: string) => void;
 }
 
-export default function FundingCallCard({ call, onEdit, onDelete }: FundingCallCardProps) {
+const FundingCallCard = ({ call, onEdit, onDelete }: FundingCallCardProps) => {
   const { user } = useAuth();
-  const isAdmin = user?.role === 'admin';
+  const [showDetail, setShowDetail] = useState(false);
+
+  const handleCardClick = () => {
+    setShowDetail(true);
+  };
 
   return (
-    <Card type={call.type}>
-      <Header>
-        <div>
-          <Title type={call.type}>{call.title}</Title>
-          <Organization>{call.organization}</Organization>
-        </div>
-        <Type type={call.type}>{call.type}</Type>
-      </Header>
+    <>
+      <Card type={call.type} onClick={handleCardClick} style={{ cursor: 'pointer' }}>
+        <Header>
+          <div>
+            <Title type={call.type}>{call.title}</Title>
+            <Organization>{call.organization}</Organization>
+          </div>
+          <Type type={call.type}>{call.type}</Type>
+        </Header>
 
-      <Status status={call.status}>
-        {call.status === 'closing_soon' ? 'Closing Soon' : call.status}
-      </Status>
+        <Description>{call.description}</Description>
 
-      <Description>{call.description}</Description>
+        <Footer>
+          <Deadline>
+            <strong>Deadline:</strong> {format(new Date(call.deadline), 'MMMM d, yyyy')}
+          </Deadline>
+          <Status status={call.status}>
+            {call.status.charAt(0).toUpperCase() + call.status.slice(1)}
+          </Status>
+        </Footer>
 
-      {call.fundingInfo.amount && (
-        <Amount>
-          <strong>Funding:</strong> {call.fundingInfo.amount}
-          {call.fundingInfo.currency && ` ${call.fundingInfo.currency}`}
-          {call.fundingInfo.duration && ` for ${call.fundingInfo.duration}`}
-        </Amount>
+        {user?.role === 'admin' && (
+          <div style={{ marginTop: '1rem', display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
+            {onEdit && (
+              <AdminButton variant="edit" onClick={(e) => {
+                e.stopPropagation();
+                onEdit(call);
+              }}>
+                Edit
+              </AdminButton>
+            )}
+            {onDelete && (
+              <AdminButton variant="delete" onClick={(e) => {
+                e.stopPropagation();
+                onDelete(call._id);
+              }}>
+                Delete
+              </AdminButton>
+            )}
+          </div>
+        )}
+      </Card>
+
+      {showDetail && (
+        <FundingCallDetail 
+          call={call} 
+          onClose={() => setShowDetail(false)} 
+        />
       )}
-
-      <Footer>
-        <Deadline>
-          <strong>Deadline:</strong> {format(new Date(call.deadline), 'MMM dd, yyyy')}
-        </Deadline>
-        <ApplyButton href={call.applicationUrl} target="_blank" type={call.type}>
-          Apply Now
-        </ApplyButton>
-      </Footer>
-      
-      {isAdmin && onEdit && onDelete && (
-        <AdminActions>
-          <AdminButton variant="edit" onClick={() => onEdit(call)}>
-            Edit
-          </AdminButton>
-          <AdminButton variant="delete" onClick={() => onDelete(call.id)}>
-            Delete
-          </AdminButton>
-        </AdminActions>
-      )}
-    </Card>
+    </>
   );
-}
+};
+
+export default FundingCallCard;
