@@ -17,37 +17,52 @@ const PORT = process.env.PORT || 5000;
 
 // Connect to MongoDB Atlas
 console.log('🔄 Attempting to connect to MongoDB...');
-connectDB().catch(err => {
+let retries = 5;
+const connectWithRetry = async () => {
+  while (retries) {
+    try {
+      await connectDB();
+      console.log('✅ MongoDB connected successfully');
+      break;
+    } catch (err) {
+      console.error(`❌ MongoDB connection attempt failed. ${retries} retries left.`);
+      retries -= 1;
+      if (retries) {
+        await new Promise(resolve => setTimeout(resolve, 5000)); // Wait 5 seconds before retrying
+      } else {
+        console.error('❌ Failed to connect to MongoDB after all retries');
+        throw err;
+      }
+    }
+  }
+};
+
+connectWithRetry().catch(err => {
   console.error('Failed to connect to MongoDB:', err);
 });
 
 // Middleware
-app.use(cors({
-  origin: (origin, callback) => {
-    const allowedOrigins = process.env.NODE_ENV === 'production'
-      ? [
-          process.env.FRONTEND_URL,
-          'https://globalgrantshub.org',
-          'https://ggh-website.pages.dev',
-          'https://backendggh.vercel.app'
-        ]
-      : ['http://localhost:5173', 'http://localhost:5174', 'http://localhost:5175'];
+const corsOptions = {
+  origin: (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
+    const allowedOrigins = [
+      'https://ggh-website.pages.dev',
+      'https://backendggh.vercel.app',
+      'http://localhost:5173',
+      'http://localhost:5174'
+    ];
     
-    // Allow requests with no origin (like mobile apps or curl requests)
-    if (!origin) {
-      return callback(null, true);
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
     }
-    
-    if (allowedOrigins.indexOf(origin) === -1) {
-      const msg = 'The CORS policy for this site does not allow access from the specified Origin.';
-      return callback(new Error(msg), false);
-    }
-    return callback(null, true);
   },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
-}));
+};
+
+app.use(cors(corsOptions));
 
 app.use(express.json());
 

@@ -12,13 +12,13 @@ import { isAdmin } from '../../middleware/auth';
 const router = express.Router();
 
 // Public routes
-router.get('/funding-calls', getFundingCalls);
-router.get('/funding-calls/:id', getFundingCall);
-router.get('/funding-stats', getFundingStats);
+router.get('/', getFundingCalls);
+router.get('/stats', getFundingStats);
+router.get('/:id', getFundingCall);
 
 // Protected routes (admin only)
-router.post('/funding-calls', isAdmin, createFundingCall);
-router.put('/funding-calls/:id', isAdmin, updateFundingCall);
-router.delete('/funding-calls/:id', isAdmin, deleteFundingCall);
+router.post('/', isAdmin, createFundingCall);
+router.put('/:id', isAdmin, updateFundingCall);
+router.delete('/:id', isAdmin, deleteFundingCall);
 
 export default router;

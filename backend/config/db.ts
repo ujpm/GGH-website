@@ -17,11 +17,13 @@ export const connectDB = async () => {
   try {
     console.log('🔄 Connecting to MongoDB Atlas...');
     
-    // Connect to MongoDB Atlas with proper options
+    // Connect to MongoDB Atlas with proper options for Mongoose 7
     await mongoose.connect(MONGODB_URI, {
-      serverSelectionTimeoutMS: 60000, // 60 seconds timeout
-      socketTimeoutMS: 45000, // 45 seconds socket timeout
-      connectTimeoutMS: 60000, // 60 seconds connect timeout
+      serverSelectionTimeoutMS: 30000,
+      socketTimeoutMS: 45000,
+      connectTimeoutMS: 30000,
+      retryWrites: true,
+      ssl: true
     });
 
     console.log('✅ Successfully connected to MongoDB Atlas');
