@@ -4,7 +4,7 @@ export type FundingStatus = 'open' | 'closing_soon' | 'closed';
 
 export interface FundingEligibility {
   criteria: string[];
-  ineligible: string[];
+  restrictions: string[];
 }
 
 export interface FundingInformation {
@@ -22,7 +22,7 @@ export interface FundingContact {
 }
 
 export interface FundingCall {
-  id: string;
+  _id: string;
   title: string;
   type: FundingType;
   organization: string;
@@ -33,9 +33,10 @@ export interface FundingCall {
   fundingInfo: FundingInformation;
   contact: FundingContact;
   applicationUrl: string;
+  requirements?: string[];
   createdAt: string;
   updatedAt: string;
-  publishedAt: string;
+  publishedAt?: string;
   featured?: boolean;
   tags?: string[];
 }

@@ -40,13 +40,13 @@ function fundingReducer(state: FundingState, action: FundingAction): FundingStat
       return {
         ...state,
         calls: state.calls.map(call =>
-          call.id === action.payload.id ? action.payload : call
+          call._id === action.payload._id ? action.payload : call
         ),
       };
     case 'DELETE_CALL':
       return {
         ...state,
-        calls: state.calls.filter(call => call.id !== action.payload),
+        calls: state.calls.filter(call => call._id !== action.payload),
       };
     case 'SET_FILTERS':
       return { ...state, filters: action.payload };

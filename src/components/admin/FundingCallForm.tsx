@@ -1,8 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
-import { FundingCall, FundingType, FundingStatus } from '../../types/grants';
-import { validateFundingCall } from '../../services/fundingService';
-import { useFunding } from '../../context/FundingContext';
+import { FundingCall } from '../../types/grants';
+import { toast } from 'react-hot-toast';
 
 const Form = styled.form`
   display: flex;
@@ -10,10 +9,6 @@ const Form = styled.form`
   gap: 1.5rem;
   max-width: 800px;
   margin: 0 auto;
-  padding: 2rem;
-  background: white;
-  border-radius: 10px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 `;
 
 const FormGroup = styled.div`
@@ -23,8 +18,8 @@ const FormGroup = styled.div`
 `;
 
 const Label = styled.label`
-  font-weight: 500;
-  color: var(--color-secondary);
+  font-weight: 600;
+  color: var(--color-text);
 `;
 
 const Input = styled.input`
@@ -32,11 +27,6 @@ const Input = styled.input`
   border: 1px solid #ddd;
   border-radius: 4px;
   font-size: 1rem;
-
-  &:focus {
-    outline: none;
-    border-color: var(--color-primary);
-  }
 `;
 
 const TextArea = styled.textarea`
@@ -44,13 +34,8 @@ const TextArea = styled.textarea`
   border: 1px solid #ddd;
   border-radius: 4px;
   font-size: 1rem;
-  min-height: 100px;
+  min-height: 150px;
   resize: vertical;
-
-  &:focus {
-    outline: none;
-    border-color: var(--color-primary);
-  }
 `;
 
 const Select = styled.select`
@@ -58,186 +43,182 @@ const Select = styled.select`
   border: 1px solid #ddd;
   border-radius: 4px;
   font-size: 1rem;
-  background: white;
-
-  &:focus {
-    outline: none;
-    border-color: var(--color-primary);
-  }
 `;
 
 const Button = styled.button`
-  padding: 1rem 2rem;
-  background: var(--color-primary);
-  color: white;
+  padding: 0.75rem 1.5rem;
   border: none;
   border-radius: 4px;
   font-size: 1rem;
-  font-weight: 500;
   cursor: pointer;
-  transition: background 0.2s;
+  transition: all 0.2s ease;
 
-  &:hover {
-    background: var(--color-primary-dark);
+  &.primary {
+    background-color: var(--color-primary);
+    color: white;
+
+    &:hover {
+      background-color: var(--color-primary-dark);
+    }
   }
 
-  &:disabled {
-    background: #ccc;
-    cursor: not-allowed;
+  &.secondary {
+    background-color: #6c757d;
+    color: white;
+
+    &:hover {
+      background-color: #5a6268;
+    }
   }
 `;
 
-const ErrorText = styled.span`
-  color: red;
-  font-size: 0.875rem;
+const ButtonGroup = styled.div`
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+  margin-top: 1rem;
 `;
 
-const ArrayInput = styled.div`
+const ArrayFieldContainer = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 1rem;
+`;
 
-  .input-row {
-    display: flex;
-    gap: 0.5rem;
+const ArrayFieldItem = styled.div`
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+`;
 
-    input {
-      flex: 1;
-    }
+const RemoveButton = styled.button`
+  padding: 0.5rem;
+  border: none;
+  background: #dc3545;
+  color: white;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: opacity 0.2s;
 
-    button {
-      padding: 0.5rem;
-      background: #f0f0f0;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
+  &:hover {
+    opacity: 0.9;
+  }
+`;
 
-      &:hover {
-        background: #e0e0e0;
-      }
-    }
+const AddButton = styled.button`
+  padding: 0.5rem 1rem;
+  border: 1px solid var(--color-primary);
+  background: white;
+  color: var(--color-primary);
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  &:hover {
+    background: var(--color-primary);
+    color: white;
   }
 `;
 
 interface FundingCallFormProps {
-  initialData?: FundingCall;
-  onSubmit: (data: Omit<FundingCall, 'id' | 'createdAt' | 'updatedAt'>) => Promise<FundingCall>;
+  initialData?: Partial<FundingCall>;
+  onSubmit: (data: Omit<FundingCall, '_id' | 'createdAt' | 'updatedAt'>) => Promise<FundingCall>;
+  onCancel?: () => void;
 }
 
-export default function FundingCallForm({ initialData, onSubmit }: FundingCallFormProps) {
-  const { dispatch } = useFunding();
-  const [formData, setFormData] = useState<Omit<FundingCall, 'id' | 'createdAt' | 'updatedAt'>>({
+const FundingCallForm: React.FC<FundingCallFormProps> = ({
+  initialData,
+  onSubmit,
+  onCancel
+}) => {
+  const [formData, setFormData] = useState<Partial<FundingCall>>({
     title: '',
-    type: 'grant' as FundingType,
-    organization: '',
     description: '',
-    deadline: '',
-    status: 'open' as FundingStatus,
-    publishedAt: new Date().toISOString(),
-    eligibility: {
-      criteria: [''],
-      ineligible: [''],
-    },
+    type: 'grant',
+    organization: '',
+    deadline: new Date().toISOString().split('T')[0],
     fundingInfo: {
       amount: '',
-      currency: '',
+      currency: 'USD',
       duration: '',
-      type: '',
+      type: ''
+    },
+    eligibility: {
+      criteria: [''],
+      restrictions: ['']
     },
     contact: {
-      website: '',
+      name: '',
       email: '',
+      phone: '',
+      website: ''
     },
     applicationUrl: '',
-    ...initialData,
+    status: 'open',
+    featured: false,
+    tags: [],
+    ...initialData
   });
-
-  const [errors, setErrors] = useState<string[]>([]);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-
-  useEffect(() => {
-    if (initialData) {
-      setFormData(prev => ({
-        ...prev,
-        ...initialData,
-      }));
-    }
-  }, [initialData]);
-
-  useEffect(() => {
-    const validationErrors = validateFundingCall(formData);
-    if (validationErrors.length > 0) {
-      setErrors(validationErrors);
-    } else {
-      setErrors([]);
-    }
-  }, [formData]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value,
-    }));
+    if (name.includes('.')) {
+      const [section, field] = name.split('.');
+      setFormData(prev => ({
+        ...prev,
+        [section]: {
+          ...(prev[section as keyof FundingCall] as Record<string, unknown>),
+          [field]: value
+        }
+      }));
+    } else {
+      setFormData(prev => ({
+        ...prev,
+        [name]: value
+      }));
+    }
   };
 
-  const handleArrayChange = (type: 'criteria' | 'ineligible', index: number, value: string) => {
+  const handleArrayChange = (type: 'criteria' | 'restrictions', index: number, value: string) => {
     setFormData(prev => ({
       ...prev,
       eligibility: {
-        ...prev.eligibility,
-        [type]: prev.eligibility[type].map((item: string, i: number) =>
+        ...prev.eligibility!,
+        [type]: prev.eligibility![type].map((item: string, i: number) =>
           i === index ? value : item
-        ),
-      },
+        )
+      }
     }));
   };
 
-  const handleArrayAdd = (type: 'criteria' | 'ineligible') => {
+  const handleAddArrayItem = (type: 'criteria' | 'restrictions') => {
     setFormData(prev => ({
       ...prev,
       eligibility: {
-        ...prev.eligibility,
-        [type]: [...prev.eligibility[type], ''],
-      },
+        ...prev.eligibility!,
+        [type]: [...prev.eligibility![type], '']
+      }
     }));
   };
 
-  const handleArrayRemove = (type: 'criteria' | 'ineligible', index: number) => {
+  const handleRemoveArrayItem = (type: 'criteria' | 'restrictions', index: number) => {
     setFormData(prev => ({
       ...prev,
       eligibility: {
-        ...prev.eligibility,
-        [type]: prev.eligibility[type].filter((_: string, i: number) => i !== index),
-      },
+        ...prev.eligibility!,
+        [type]: prev.eligibility![type].filter((_: string, i: number) => i !== index)
+      }
     }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsSubmitting(true);
-    setErrors([]);
-
-    const validationErrors = validateFundingCall(formData);
-    if (validationErrors.length > 0) {
-      setErrors(validationErrors);
-      setIsSubmitting(false);
-      return;
-    }
-
     try {
-      const savedData = await onSubmit(formData);
-      // Only dispatch if we have a complete FundingCall with ID
-      if ('id' in savedData) {
-        dispatch({ 
-          type: initialData ? 'UPDATE_CALL' : 'ADD_CALL', 
-          payload: savedData as FundingCall 
-        });
-      }
+      await onSubmit(formData as Omit<FundingCall, '_id' | 'createdAt' | 'updatedAt'>);
+      toast.success('Funding call saved successfully!');
     } catch (error) {
-      setErrors(['Failed to save funding call']);
-    } finally {
-      setIsSubmitting(false);
+      console.error('Error saving funding call:', error);
+      toast.error('Failed to save funding call');
     }
   };
 
@@ -246,10 +227,20 @@ export default function FundingCallForm({ initialData, onSubmit }: FundingCallFo
       <FormGroup>
         <Label>Title</Label>
         <Input
+          type="text"
           name="title"
           value={formData.title}
           onChange={handleChange}
-          placeholder="Enter funding call title"
+          required
+        />
+      </FormGroup>
+
+      <FormGroup>
+        <Label>Description</Label>
+        <TextArea
+          name="description"
+          value={formData.description}
+          onChange={handleChange}
           required
         />
       </FormGroup>
@@ -266,21 +257,10 @@ export default function FundingCallForm({ initialData, onSubmit }: FundingCallFo
       <FormGroup>
         <Label>Organization</Label>
         <Input
+          type="text"
           name="organization"
           value={formData.organization}
           onChange={handleChange}
-          placeholder="Enter organization name"
-          required
-        />
-      </FormGroup>
-
-      <FormGroup>
-        <Label>Description</Label>
-        <TextArea
-          name="description"
-          value={formData.description}
-          onChange={handleChange}
-          placeholder="Enter detailed description"
           required
         />
       </FormGroup>
@@ -297,138 +277,143 @@ export default function FundingCallForm({ initialData, onSubmit }: FundingCallFo
       </FormGroup>
 
       <FormGroup>
-        <Label>Status</Label>
-        <Select name="status" value={formData.status} onChange={handleChange} required>
-          <option value="open">Open</option>
-          <option value="closed">Closed</option>
-        </Select>
+        <Label>Funding Information</Label>
+        <Input
+          type="text"
+          name="fundingInfo.amount"
+          placeholder="Amount"
+          value={formData.fundingInfo?.amount}
+          onChange={handleChange}
+        />
+        <Input
+          type="text"
+          name="fundingInfo.duration"
+          placeholder="Duration"
+          value={formData.fundingInfo?.duration}
+          onChange={handleChange}
+        />
       </FormGroup>
 
       <FormGroup>
         <Label>Eligibility Criteria</Label>
-        <ArrayInput>
-          {formData.eligibility.criteria.map((criterion, index) => (
-            <div key={index} className="input-row">
+        <ArrayFieldContainer>
+          {formData.eligibility?.criteria.map((criterion, index) => (
+            <ArrayFieldItem key={index}>
               <Input
+                type="text"
                 value={criterion}
                 onChange={(e) => handleArrayChange('criteria', index, e.target.value)}
-                placeholder="Enter eligibility criterion"
+                placeholder="Enter criterion"
+                required
               />
-              <button
-                type="button"
-                onClick={() => handleArrayRemove('criteria', index)}
-              >
-                Remove
-              </button>
-            </div>
+              {index > 0 && (
+                <RemoveButton
+                  type="button"
+                  onClick={() => handleRemoveArrayItem('criteria', index)}
+                >
+                  Remove
+                </RemoveButton>
+              )}
+            </ArrayFieldItem>
           ))}
-          <Button type="button" onClick={() => handleArrayAdd('criteria')}>
+          <AddButton type="button" onClick={() => handleAddArrayItem('criteria')}>
             Add Criterion
-          </Button>
-        </ArrayInput>
+          </AddButton>
+        </ArrayFieldContainer>
       </FormGroup>
 
       <FormGroup>
-        <Label>Ineligibility Criteria</Label>
-        <ArrayInput>
-          {formData.eligibility.ineligible.map((criterion, index) => (
-            <div key={index} className="input-row">
+        <Label>Restrictions</Label>
+        <ArrayFieldContainer>
+          {formData.eligibility?.restrictions.map((restriction, index) => (
+            <ArrayFieldItem key={index}>
               <Input
-                value={criterion}
-                onChange={(e) => handleArrayChange('ineligible', index, e.target.value)}
-                placeholder="Enter ineligibility criterion"
+                type="text"
+                value={restriction}
+                onChange={(e) => handleArrayChange('restrictions', index, e.target.value)}
+                placeholder="Enter restriction"
+                required
               />
-              <button
-                type="button"
-                onClick={() => handleArrayRemove('ineligible', index)}
-              >
-                Remove
-              </button>
-            </div>
+              {index > 0 && (
+                <RemoveButton
+                  type="button"
+                  onClick={() => handleRemoveArrayItem('restrictions', index)}
+                >
+                  Remove
+                </RemoveButton>
+              )}
+            </ArrayFieldItem>
           ))}
-          <Button type="button" onClick={() => handleArrayAdd('ineligible')}>
-            Add Criterion
-          </Button>
-        </ArrayInput>
-      </FormGroup>
-
-      <FormGroup>
-        <Label>Funding Information</Label>
-        <Input
-          name="fundingInfo.amount"
-          value={formData.fundingInfo.amount}
-          onChange={handleChange}
-          placeholder="Enter funding amount"
-        />
-        <Input
-          name="fundingInfo.currency"
-          value={formData.fundingInfo.currency}
-          onChange={handleChange}
-          placeholder="Enter currency"
-        />
-        <Input
-          name="fundingInfo.duration"
-          value={formData.fundingInfo.duration}
-          onChange={handleChange}
-          placeholder="Enter funding duration"
-        />
-        <Input
-          name="fundingInfo.type"
-          value={formData.fundingInfo.type}
-          onChange={handleChange}
-          placeholder="Enter funding type"
-        />
+          <AddButton type="button" onClick={() => handleAddArrayItem('restrictions')}>
+            Add Restriction
+          </AddButton>
+        </ArrayFieldContainer>
       </FormGroup>
 
       <FormGroup>
         <Label>Contact Information</Label>
         <Input
-          name="contact.website"
-          value={formData.contact.website}
+          type="text"
+          name="contact.name"
+          placeholder="Contact Name"
+          value={formData.contact?.name}
           onChange={handleChange}
-          placeholder="Enter website URL"
         />
         <Input
+          type="email"
           name="contact.email"
-          value={formData.contact.email}
+          placeholder="Email"
+          value={formData.contact?.email}
           onChange={handleChange}
-          placeholder="Enter contact email"
+        />
+        <Input
+          type="tel"
+          name="contact.phone"
+          placeholder="Phone"
+          value={formData.contact?.phone}
+          onChange={handleChange}
+        />
+        <Input
+          type="url"
+          name="contact.website"
+          placeholder="Website"
+          value={formData.contact?.website}
+          onChange={handleChange}
         />
       </FormGroup>
 
       <FormGroup>
         <Label>Application URL</Label>
         <Input
+          type="url"
           name="applicationUrl"
           value={formData.applicationUrl}
           onChange={handleChange}
-          placeholder="Enter application URL"
           required
         />
       </FormGroup>
 
       <FormGroup>
-        <Label>Published At</Label>
-        <Input
-          type="datetime-local"
-          name="publishedAt"
-          value={formData.publishedAt}
-          onChange={handleChange}
-          required
-        />
+        <Label>Status</Label>
+        <Select name="status" value={formData.status} onChange={handleChange} required>
+          <option value="open">Open</option>
+          <option value="closing_soon">Closing Soon</option>
+          <option value="closed">Closed</option>
+        </Select>
       </FormGroup>
 
-      {errors.length > 0 && (
-        <div>
-          {errors.map((error, index) => (
-            <ErrorText key={index}>{error}</ErrorText>
-          ))}
-        </div>
-      )}
-
-      <Button type="submit" disabled={isSubmitting}>
-        {isSubmitting ? 'Saving...' : 'Save Funding Call'}
-      </Button>
+      <ButtonGroup>
+        {onCancel && (
+          <Button type="button" className="secondary" onClick={onCancel}>
+            Cancel
+          </Button>
+        )}
+        <Button type="submit" className="primary">
+          Save
+        </Button>
+      </ButtonGroup>
     </Form>
   );
-}
+};
+
+export default FundingCallForm;

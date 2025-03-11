@@ -1,7 +1,7 @@
 import styled from 'styled-components';
 import TeamMember from './TeamMember';
 import { TeamMember as TeamMemberType } from '../../types/team';
-import logo from "../../assets/logo.png";
+import logo from "../../assets/logo.svg";
 
 const Section = styled.section`
   padding: 4rem 2rem;

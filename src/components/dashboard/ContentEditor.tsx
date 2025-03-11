@@ -185,7 +185,7 @@ const ContentEditor: React.FC = () => {
       setFormData(prev => ({
         ...prev,
         [section]: {
-          ...prev[section as keyof ContentData],
+          ...(prev[section as keyof ContentData] as Record<string, unknown>),
           [field]: value
         }
       }));

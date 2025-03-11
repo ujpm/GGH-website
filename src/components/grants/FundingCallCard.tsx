@@ -26,18 +26,7 @@ const Card = styled.div<{ type: string }>`
 
   &:hover {
     transform: translateY(-4px);
-    box-shadow: 0 8px 24px ${props => {
-      switch (props.type) {
-        case 'grant':
-          return 'var(--color-primary)';
-        case 'scholarship':
-          return '#3498DB';
-        case 'resource':
-          return '#27AE60';
-        default:
-          return 'var(--color-primary)';
-      }
-    }};
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
   }
 `;
 
@@ -79,13 +68,13 @@ const Type = styled.span<{ type: string }>`
   background: ${props => {
     switch (props.type) {
       case 'grant':
-        return 'var(--color-primary)';
+        return '#E8F5E9';
       case 'scholarship':
-        return '#3498DB';
+        return '#E3F2FD';
       case 'resource':
-        return '#27AE60';
+        return '#E8F5E9';
       default:
-        return 'var(--color-primary)';
+        return '#E8F5E9';
     }
   }};
   color: ${props => {
@@ -93,7 +82,7 @@ const Type = styled.span<{ type: string }>`
       case 'grant':
         return 'var(--color-primary)';
       case 'scholarship':
-        return '#2C3E50';
+        return '#1976D2';
       case 'resource':
         return '#27AE60';
       default:
@@ -105,10 +94,39 @@ const Type = styled.span<{ type: string }>`
   font-size: 0.85rem;
   font-weight: 600;
   text-transform: capitalize;
-  white-space: nowrap;
 `;
 
-const Status = styled.div<{ status: string }>`
+const Description = styled.p`
+  color: #444;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  margin: 1.25rem 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+`;
+
+const Footer = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #eee;
+`;
+
+const Deadline = styled.div`
+  font-size: 0.95rem;
+  color: #666;
+
+  strong {
+    color: #444;
+    font-weight: 600;
+  }
+`;
+
+const Status = styled.span<{ status: string }>`
   background: ${props => {
     switch (props.status) {
       case 'open':
@@ -134,99 +152,6 @@ const Status = styled.div<{ status: string }>`
   font-size: 0.85rem;
   font-weight: 600;
   text-transform: capitalize;
-  display: inline-block;
-`;
-
-const Description = styled.p`
-  color: #444;
-  font-size: 0.95rem;
-  line-height: 1.6;
-  margin: 1.25rem 0;
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-`;
-
-const Footer = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-top: 1.5rem;
-  padding-top: 1.5rem;
-  border-top: 1px solid #eee;
-  gap: 1rem;
-`;
-
-const Deadline = styled.div`
-  font-size: 0.95rem;
-  color: #666;
-
-  strong {
-    color: #444;
-    font-weight: 600;
-  }
-`;
-
-const ApplyButton = styled.a<{ type: string }>`
-  background: ${props => {
-    switch (props.type) {
-      case 'grant':
-        return 'var(--color-primary)';
-      case 'scholarship':
-        return '#3498DB';
-      case 'resource':
-        return '#27AE60';
-      default:
-        return 'var(--color-primary)';
-    }
-  }};
-  color: white;
-  padding: 0.75rem 1.5rem;
-  border-radius: 8px;
-  text-decoration: none;
-  font-size: 0.95rem;
-  font-weight: 600;
-  transition: all 0.2s ease;
-  white-space: nowrap;
-
-  &:hover {
-    background: ${props => {
-      switch (props.type) {
-        case 'grant':
-          return 'var(--color-primary-dark)';
-        case 'scholarship':
-          return '#2980B9';
-        case 'resource':
-          return '#219A52';
-        default:
-          return 'var(--color-primary-dark)';
-      }
-    }};
-    transform: translateY(-2px);
-  }
-`;
-
-const Amount = styled.div`
-  font-size: 0.95rem;
-  color: #666;
-  margin-top: 1rem;
-  padding: 0.75rem;
-  background: #f8f9fa;
-  border-radius: 8px;
-
-  strong {
-    color: #444;
-    font-weight: 600;
-  }
-`;
-
-const AdminActions = styled.div`
-  display: flex;
-  gap: 0.5rem;
-  margin-top: 1rem;
-  padding-top: 1rem;
-  border-top: 1px solid #eee;
 `;
 
 const AdminButton = styled.button<{ variant: 'edit' | 'delete' }>`
@@ -234,10 +159,10 @@ const AdminButton = styled.button<{ variant: 'edit' | 'delete' }>`
   color: ${props => props.variant === 'edit' ? '#1976D2' : '#C62828'};
   border: none;
   padding: 0.5rem 1rem;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 0.875rem;
+  border-radius: 6px;
+  font-size: 0.9rem;
   font-weight: 500;
+  cursor: pointer;
   transition: all 0.2s ease;
 
   &:hover {

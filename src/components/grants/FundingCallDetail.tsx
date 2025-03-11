@@ -1,9 +1,10 @@
-import React from 'react';
+import { FC } from 'react';
 import styled from 'styled-components';
 import { format } from 'date-fns';
 import { FundingCall } from '../../types/grants';
+import { motion } from 'framer-motion';
 
-const ModalOverlay = styled.div`
+const Overlay = styled(motion.div)`
   position: fixed;
   top: 0;
   left: 0;
@@ -14,133 +15,159 @@ const ModalOverlay = styled.div`
   justify-content: center;
   align-items: center;
   z-index: 1000;
+  padding: 2rem;
 `;
 
-const ModalContent = styled.div<{ type: string }>`
+const Modal = styled(motion.div)`
   background: white;
   border-radius: 16px;
-  padding: 2rem;
+  width: 100%;
   max-width: 800px;
-  width: 90%;
   max-height: 90vh;
   overflow-y: auto;
+  padding: 2.5rem;
   position: relative;
-  border: 2px solid ${props => {
-    switch (props.type) {
-      case 'grant':
-        return 'var(--color-primary)';
-      case 'scholarship':
-        return '#3498DB';
-      case 'resource':
-        return '#27AE60';
-      default:
-        return 'var(--color-primary)';
-    }
-  }};
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+
+  &::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 4px;
+  }
+
+  &::-webkit-scrollbar-thumb:hover {
+    background: #555;
+  }
 `;
 
 const CloseButton = styled.button`
   position: absolute;
-  top: 1rem;
-  right: 1rem;
+  top: 1.5rem;
+  right: 1.5rem;
   background: none;
   border: none;
   font-size: 1.5rem;
   cursor: pointer;
   color: #666;
+  padding: 0.5rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+
   &:hover {
+    background: #f5f5f5;
     color: #333;
   }
 `;
 
-const Title = styled.h2<{ type: string }>`
-  color: ${props => {
-    switch (props.type) {
-      case 'grant':
-        return 'var(--color-primary)';
-      case 'scholarship':
-        return '#2C3E50';
-      case 'resource':
-        return '#27AE60';
-      default:
-        return 'var(--color-primary)';
-    }
-  }};
-  margin: 0 0 1rem;
+const Header = styled.div`
+  margin-bottom: 2rem;
+`;
+
+const Title = styled.h2`
+  color: var(--color-primary);
+  margin: 0 0 0.5rem 0;
   font-size: 2rem;
+  padding-right: 2rem;
 `;
 
 const Organization = styled.div`
-  font-size: 1.2rem;
   color: #666;
-  margin-bottom: 1.5rem;
+  font-size: 1.1rem;
 `;
 
 const Section = styled.section`
   margin: 2rem 0;
+
+  &:first-of-type {
+    margin-top: 0;
+  }
+
+  &:last-of-type {
+    margin-bottom: 0;
+  }
 `;
 
 const SectionTitle = styled.h3`
-  color: #2C3E50;
-  margin: 0 0 1rem;
-  font-size: 1.3rem;
+  color: #333;
+  margin: 0 0 1rem 0;
+  font-size: 1.25rem;
 `;
 
 const Description = styled.p`
   color: #444;
-  line-height: 1.8;
-  font-size: 1.1rem;
-  margin: 0 0 1.5rem;
+  line-height: 1.6;
+  font-size: 1rem;
+  white-space: pre-wrap;
+`;
+
+const List = styled.ul`
+  list-style: none;
+  padding: 0;
+  margin: 0;
+`;
+
+const ListItem = styled.li`
+  color: #444;
+  margin: 0.75rem 0;
+  padding-left: 1.5rem;
+  position: relative;
+  line-height: 1.5;
+
+  &:before {
+    content: "•";
+    color: var(--color-primary);
+    position: absolute;
+    left: 0;
+  }
+
+  &:first-child {
+    margin-top: 0;
+  }
+
+  &:last-child {
+    margin-bottom: 0;
+  }
 `;
 
 const InfoGrid = styled.div`
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 1.5rem;
-  margin: 1.5rem 0;
+  margin-top: 1rem;
 `;
 
-const InfoItem = styled.div`
+const InfoCard = styled.div`
   background: #f8f9fa;
   padding: 1.25rem;
-  border-radius: 8px;
+  border-radius: 12px;
 `;
 
-const InfoTitle = styled.h4`
-  color: #2C3E50;
-  margin: 0 0 0.5rem;
-  font-size: 1rem;
+const InfoLabel = styled.div`
+  color: #666;
+  font-size: 0.9rem;
+  margin-bottom: 0.5rem;
 `;
 
-const InfoContent = styled.div`
-  color: #444;
-  font-size: 0.95rem;
+const InfoValue = styled.div`
+  color: #333;
+  font-size: 1.1rem;
+  font-weight: 600;
 `;
 
-const List = styled.ul`
-  margin: 0;
-  padding-left: 1.5rem;
-  
-  li {
-    margin-bottom: 0.5rem;
-    color: #444;
-  }
-`;
-
-const ApplyButton = styled.a<{ type: string }>`
+const ApplyButton = styled.a`
   display: inline-block;
-  background: ${props => {
-    switch (props.type) {
-      case 'grant':
-        return 'var(--color-primary)';
-      case 'scholarship':
-        return '#3498DB';
-      case 'resource':
-        return '#27AE60';
-      default:
-        return 'var(--color-primary)';
-    }
-  }};
+  background: var(--color-primary);
   color: white;
   padding: 1rem 2rem;
   border-radius: 8px;
@@ -150,7 +177,7 @@ const ApplyButton = styled.a<{ type: string }>`
   transition: all 0.2s ease;
 
   &:hover {
-    opacity: 0.9;
+    background: var(--color-primary-dark);
     transform: translateY(-2px);
   }
 `;
@@ -160,94 +187,130 @@ interface FundingCallDetailProps {
   onClose: () => void;
 }
 
-const FundingCallDetail: React.FC<FundingCallDetailProps> = ({ call, onClose }) => {
-  // Prevent clicks inside the modal from closing it
-  const handleContentClick = (e: React.MouseEvent) => {
-    e.stopPropagation();
-  };
-
+const FundingCallDetail: FC<FundingCallDetailProps> = ({ call, onClose }) => {
   return (
-    <ModalOverlay onClick={onClose}>
-      <ModalContent type={call.type} onClick={handleContentClick}>
-        <CloseButton onClick={onClose}>&times;</CloseButton>
-        
-        <Title type={call.type}>{call.title}</Title>
-        <Organization>{call.organization}</Organization>
-        
-        <Description>{call.description}</Description>
-        
-        <InfoGrid>
-          <InfoItem>
-            <InfoTitle>Status</InfoTitle>
-            <InfoContent style={{ 
-              color: call.status === 'open' ? '#2E7D32' : 
-                     call.status === 'closing_soon' ? '#E65100' : '#C62828'
-            }}>
-              {call.status.charAt(0).toUpperCase() + call.status.slice(1)}
-            </InfoContent>
-          </InfoItem>
-          
-          <InfoItem>
-            <InfoTitle>Deadline</InfoTitle>
-            <InfoContent>
-              {format(new Date(call.deadline), 'MMMM d, yyyy')}
-            </InfoContent>
-          </InfoItem>
-          
-          {call.fundingInfo && (
-            <InfoItem>
-              <InfoTitle>Funding Details</InfoTitle>
-              <InfoContent>
-                {call.fundingInfo.amount && `${call.fundingInfo.amount} ${call.fundingInfo.currency}`}
-                {call.fundingInfo.type && <div>{call.fundingInfo.type}</div>}
-                {call.fundingInfo.duration && <div>Duration: {call.fundingInfo.duration}</div>}
-              </InfoContent>
-            </InfoItem>
+    <Overlay
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      onClick={onClose}
+    >
+      <Modal
+        initial={{ scale: 0.9, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        exit={{ scale: 0.9, opacity: 0 }}
+        onClick={e => e.stopPropagation()}
+      >
+        <CloseButton onClick={onClose}>×</CloseButton>
+
+        <Header>
+          <Title>{call.title}</Title>
+          <Organization>{call.organization}</Organization>
+        </Header>
+
+        <Section>
+          <SectionTitle>Description</SectionTitle>
+          <Description>{call.description}</Description>
+        </Section>
+
+        <Section>
+          <SectionTitle>Funding Information</SectionTitle>
+          <InfoGrid>
+            {call.fundingInfo.amount && (
+              <InfoCard>
+                <InfoLabel>Amount</InfoLabel>
+                <InfoValue>{call.fundingInfo.amount}</InfoValue>
+              </InfoCard>
+            )}
+            {call.fundingInfo.duration && (
+              <InfoCard>
+                <InfoLabel>Duration</InfoLabel>
+                <InfoValue>{call.fundingInfo.duration}</InfoValue>
+              </InfoCard>
+            )}
+            <InfoCard>
+              <InfoLabel>Deadline</InfoLabel>
+              <InfoValue>{format(new Date(call.deadline), 'MMMM d, yyyy')}</InfoValue>
+            </InfoCard>
+            <InfoCard>
+              <InfoLabel>Status</InfoLabel>
+              <InfoValue>{call.status.replace('_', ' ').toUpperCase()}</InfoValue>
+            </InfoCard>
+          </InfoGrid>
+        </Section>
+
+        <Section>
+          <SectionTitle>Eligibility Criteria</SectionTitle>
+          <List>
+            {call.eligibility.criteria.map((criterion, index) => (
+              <ListItem key={index}>{criterion}</ListItem>
+            ))}
+          </List>
+
+          {call.eligibility.restrictions && call.eligibility.restrictions.length > 0 && (
+            <>
+              <SectionTitle style={{ marginTop: '1.5rem' }}>Restrictions</SectionTitle>
+              <List>
+                {call.eligibility.restrictions.map((restriction, index) => (
+                  <ListItem key={index}>{restriction}</ListItem>
+                ))}
+              </List>
+            </>
           )}
-        </InfoGrid>
+        </Section>
 
-        {call.eligibility && (
-          <Section>
-            <SectionTitle>Eligibility</SectionTitle>
-            {call.eligibility.criteria && (
-              <>
-                <InfoTitle>Criteria</InfoTitle>
-                <List>
-                  {call.eligibility.criteria.map((criterion, index) => (
-                    <li key={index}>{criterion}</li>
-                  ))}
-                </List>
-              </>
-            )}
-            {call.eligibility.restrictions && (
-              <>
-                <InfoTitle style={{ marginTop: '1rem' }}>Restrictions</InfoTitle>
-                <List>
-                  {call.eligibility.restrictions.map((restriction, index) => (
-                    <li key={index}>{restriction}</li>
-                  ))}
-                </List>
-              </>
-            )}
-          </Section>
-        )}
-
-        {call.requirements && (
+        {call.requirements && call.requirements.length > 0 && (
           <Section>
             <SectionTitle>Requirements</SectionTitle>
             <List>
               {call.requirements.map((requirement, index) => (
-                <li key={index}>{requirement}</li>
+                <ListItem key={index}>{requirement}</ListItem>
               ))}
             </List>
           </Section>
         )}
 
-        <ApplyButton href={call.applicationUrl} target="_blank" type={call.type}>
+        {call.contact && Object.values(call.contact).some(value => value) && (
+          <Section>
+            <SectionTitle>Contact Information</SectionTitle>
+            <InfoGrid>
+              {call.contact.name && (
+                <InfoCard>
+                  <InfoLabel>Contact Person</InfoLabel>
+                  <InfoValue>{call.contact.name}</InfoValue>
+                </InfoCard>
+              )}
+              {call.contact.email && (
+                <InfoCard>
+                  <InfoLabel>Email</InfoLabel>
+                  <InfoValue>{call.contact.email}</InfoValue>
+                </InfoCard>
+              )}
+              {call.contact.phone && (
+                <InfoCard>
+                  <InfoLabel>Phone</InfoLabel>
+                  <InfoValue>{call.contact.phone}</InfoValue>
+                </InfoCard>
+              )}
+              {call.contact.website && (
+                <InfoCard>
+                  <InfoLabel>Website</InfoLabel>
+                  <InfoValue>
+                    <a href={call.contact.website} target="_blank" rel="noopener noreferrer">
+                      Visit Website
+                    </a>
+                  </InfoValue>
+                </InfoCard>
+              )}
+            </InfoGrid>
+          </Section>
+        )}
+
+        <ApplyButton href={call.applicationUrl} target="_blank" rel="noopener noreferrer">
           Apply Now
         </ApplyButton>
-      </ModalContent>
-    </ModalOverlay>
+      </Modal>
+    </Overlay>
   );
 };
 

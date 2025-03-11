@@ -318,7 +318,7 @@ export default function FundingCallsList({ type, itemsPerPage = 9 }: FundingCall
 
   const handleEdit = async (call: FundingCall) => {
     if (!isAdmin) return;
-    window.location.href = `/dashboard/edit/${call.id}`;
+    window.location.href = `/dashboard/edit/${call._id}`;
   };
 
   const handleDelete = async (id: string) => {
@@ -386,7 +386,7 @@ export default function FundingCallsList({ type, itemsPerPage = 9 }: FundingCall
           <Grid>
             {currentCalls.map(call => (
               <FundingCallCard 
-                key={call.id} 
+                key={call._id} 
                 call={call}
                 onEdit={isAdmin ? handleEdit : undefined}
                 onDelete={isAdmin ? handleDelete : undefined}
