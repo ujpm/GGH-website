@@ -3,27 +3,55 @@ name = "ggh-frontend"
 compatibility_date = "2025-03-11"
 
 [build]
-command = "npm install && npm run build"
-publish = "dist"
+command = "npm run cloudflare:build"
+output_directory = "dist"
+base_directory = "."
+
+[build.upload]
+format = "service-worker"
+
+[site]
+bucket = "./dist"
+entry-point = "dist/index.html"
 
 [build.environment]
 NODE_VERSION = "18"
 
+# Environment variables for production
 [env.production]
 VITE_APP_ENV = "production"
 VITE_API_URL = "https://backendggh.vercel.app"
 VITE_ENABLE_ADMIN_FEATURES = "true"
 VITE_ENABLE_PUBLIC_ACCESS = "true"
-VITE_MAX_UPLOAD_SIZE = "5242880"
-VITE_ALLOWED_FILE_TYPES = "pdf,doc,docx,txt"
-VITE_AUTH_ENABLED = "true"
-VITE_GOOGLE_AUTH_ENABLED = "true"
 
-# Routes configuration
+# Routes for public content access
+[[routes]]
+pattern = "/grants/*"
+forward = "/index.html"
+status = 200
+
+[[routes]]
+pattern = "/scholarships/*"
+forward = "/index.html"
+status = 200
+
+[[routes]]
+pattern = "/resources/*"
+forward = "/index.html"
+status = 200
+
+# Admin routes (still accessible but protected by frontend auth)
+[[routes]]
+pattern = "/dashboard/*"
+forward = "/index.html"
+status = 200
+
+# API proxy to backend
 [[routes]]
 pattern = "/api/*"
 forward = "https://backendggh.vercel.app/api/:splat"
 
+# Default route
 [[routes]]
 pattern = "/*"
 forward = "/index.html"
