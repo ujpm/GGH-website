@@ -25,7 +25,12 @@ connectDB().catch(err => {
 app.use(cors({
   origin: (origin, callback) => {
     const allowedOrigins = process.env.NODE_ENV === 'production'
-      ? [process.env.FRONTEND_URL, 'https://globalgrantshub.org']
+      ? [
+          process.env.FRONTEND_URL,
+          'https://globalgrantshub.org',
+          'https://ggh-website.pages.dev',
+          'https://backendggh.vercel.app'
+        ]
       : ['http://localhost:5173', 'http://localhost:5174', 'http://localhost:5175'];
     
     // Allow requests with no origin (like mobile apps or curl requests)

@@ -11,5 +11,9 @@
       "src": "/(.*)",
       "dest": "server.ts"
     }
-  ]
+  ],
+  "env": {
+    "NODE_ENV": "production",
+    "FRONTEND_URL": "https://ggh-website.pages.dev"
+  }
 }
