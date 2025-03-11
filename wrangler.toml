@@ -3,21 +3,14 @@ name = "ggh-frontend"
 
 [build]
 command = "npm install && npm run build"
-dist = "dist"
+pages_build_output_dir = "dist"
 
 [site]
 bucket = "./dist"
 
 [env.production]
+NODE_VERSION = "18"
 VITE_APP_ENV = "production"
 VITE_API_URL = "https://backendggh.vercel.app"
 VITE_ENABLE_ADMIN_FEATURES = "true"
 VITE_ENABLE_PUBLIC_ACCESS = "true"
-
-[[routes]]
-pattern = "/api/*"
-script = "_worker"
-
-[[routes]]
-pattern = "/*"
-script = "_worker"
