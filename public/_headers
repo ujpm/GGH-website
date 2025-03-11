@@ -1,0 +1,23 @@
+/*
+  X-Frame-Options: DENY
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  Access-Control-Allow-Origin: https://backendggh.vercel.app
+  Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS
+  Access-Control-Allow-Headers: Content-Type, Authorization
+
+/grants/*
+  Cache-Control: public, max-age=3600
+  Access-Control-Allow-Origin: *
+
+/scholarships/*
+  Cache-Control: public, max-age=3600
+  Access-Control-Allow-Origin: *
+
+/resources/*
+  Cache-Control: public, max-age=3600
+  Access-Control-Allow-Origin: *
+
+/dashboard/*
+  Cache-Control: no-store
+  Strict-Transport-Security: max-age=31536000; includeSubDomains
