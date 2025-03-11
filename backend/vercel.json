@@ -9,11 +9,21 @@
   "routes": [
     {
       "src": "/(.*)",
-      "dest": "server.ts"
+      "dest": "server.ts",
+      "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+      "headers": {
+        "Access-Control-Allow-Origin": "https://ggh-website.pages.dev",
+        "Access-Control-Allow-Methods": "GET,POST,PUT,DELETE,OPTIONS",
+        "Access-Control-Allow-Headers": "Content-Type, Authorization"
+      }
     }
   ],
   "env": {
     "NODE_ENV": "production",
-    "FRONTEND_URL": "https://ggh-website.pages.dev"
+    "FRONTEND_URL": "https://ggh-website.pages.dev",
+    "CORS_ORIGIN": "https://ggh-website.pages.dev",
+    "PORT": "443",
+    "LOG_LEVEL": "error",
+    "ENABLE_REQUEST_LOGGING": "true"
   }
 }
