@@ -16,36 +16,69 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 // Connect to MongoDB Atlas
-connectDB();
+console.log('🔄 Attempting to connect to MongoDB...');
+connectDB().catch(err => {
+  console.error('Failed to connect to MongoDB:', err);
+});
 
 // Middleware
 app.use(cors({
-  origin: process.env.NODE_ENV === 'production' 
-    ? ['https://globalgrantshub.org'] 
-    : ['http://localhost:5173', 'http://localhost:5174', 'http://localhost:5175'],
+  origin: (origin, callback) => {
+    const allowedOrigins = process.env.NODE_ENV === 'production'
+      ? [process.env.FRONTEND_URL, 'https://globalgrantshub.org']
+      : ['http://localhost:5173', 'http://localhost:5174', 'http://localhost:5175'];
+    
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) {
+      return callback(null, true);
+    }
+    
+    if (allowedOrigins.indexOf(origin) === -1) {
+      const msg = 'The CORS policy for this site does not allow access from the specified Origin.';
+      return callback(new Error(msg), false);
+    }
+    return callback(null, true);
+  },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
+
 app.use(express.json());
 
-// Routes
+// Health check route
+app.get('/', (req, res) => {
+  res.json({ 
+    status: 'ok',
+    message: 'Global Grants Hub API is running',
+    environment: process.env.NODE_ENV,
+    timestamp: new Date().toISOString()
+  });
+});
+
+// API Routes
 app.use('/api/auth', authRoutes);
-app.use('/api/content', contentRoutes); 
+app.use('/api/content', contentRoutes);
 app.use('/api/dashboard', dashboardRoutes);
-app.use('/api', fundingRoutes);
+app.use('/api/funding', fundingRoutes);
 
 // Error handling middleware
-app.use((err: any, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
+app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
   console.error('Error:', err);
-  res.status(500).json({ error: 'Internal server error' });
+  res.status(500).json({ 
+    error: 'Something went wrong!',
+    message: process.env.NODE_ENV === 'development' ? err.message : undefined
+  });
 });
 
 // Start server
 app.listen(PORT, () => {
-  console.log(`
-🚀 Server running on port ${PORT}
-📁 API endpoints available at http://localhost:${PORT}/api
-🔒 Admin dashboard at http://localhost:${PORT}/dashboard (requires admin login)
-  `);
+  console.log(`🚀 Server running on port ${PORT}`);
+  console.log(`Environment: ${process.env.NODE_ENV}`);
+  if (process.env.NODE_ENV === 'development') {
+    console.log(`
+      📁 API endpoints available at http://localhost:${PORT}/api
+      🔒 Admin dashboard at http://localhost:${PORT}/dashboard
+    `);
+  }
 });

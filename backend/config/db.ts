@@ -19,47 +19,46 @@ export const connectDB = async () => {
     
     // Connect to MongoDB Atlas with proper options
     await mongoose.connect(MONGODB_URI, {
-      // These options help with connection stability
-      serverSelectionTimeoutMS: 5000,
-      socketTimeoutMS: 45000,
+      serverSelectionTimeoutMS: 60000, // 60 seconds timeout
+      socketTimeoutMS: 45000, // 45 seconds socket timeout
+      connectTimeoutMS: 60000, // 60 seconds connect timeout
     });
-    
-    console.log('✅ Connected to MongoDB Atlas');
-    
-    // Initialize admin user
-    const adminEmail = process.env.ADMIN_EMAIL;
-    const adminPassword = process.env.ADMIN_PASSWORD;
 
-    if (!adminEmail || !adminPassword) {
-      console.warn('⚠️ Admin credentials not found in environment variables');
-      return;
-    }
+    console.log('✅ Successfully connected to MongoDB Atlas');
 
-    // Check if admin exists
-    const User = mongoose.model('User');
-    const adminExists = await User.findOne({ email: adminEmail });
-
-    if (adminExists) {
-      // Update admin role if needed
-      if (adminExists.role !== 'admin') {
-        await User.findByIdAndUpdate(adminExists._id, { role: 'admin' });
-        console.log('✅ Admin role updated');
+    // Initialize admin user if in development
+    if (process.env.NODE_ENV !== 'production') {
+      try {
+        const User = mongoose.model('User');
+        const adminExists = await User.findOne({ email: 'admin@globalgrantshub.org' });
+        
+        if (!adminExists) {
+          const hashedPassword = await bcrypt.hash('admin123', 10);
+          await User.create({
+            name: 'Admin',
+            email: 'admin@globalgrantshub.org',
+            password: hashedPassword,
+            role: 'admin'
+          });
+          console.log('✅ Admin user created successfully');
+        }
+      } catch (error) {
+        console.error('Error initializing admin user:', error);
       }
-    } else {
-      // Create admin user
-      await User.create({
-        email: adminEmail,
-        password: await bcrypt.hash(adminPassword, 10),
-        name: 'Admin',
-        role: 'admin'
-      });
-      console.log('✅ Admin user created');
     }
 
-    // Seed funding calls
-    await seedFundingCalls();
+    // Seed funding calls in development
+    if (process.env.NODE_ENV !== 'production') {
+      try {
+        await seedFundingCalls();
+        console.log('✅ Funding calls seeded successfully');
+      } catch (error) {
+        console.error('Error seeding funding calls:', error);
+      }
+    }
+
   } catch (error) {
     console.error('❌ MongoDB connection error:', error);
-    process.exit(1);
+    throw error;
   }
 };
