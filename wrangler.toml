@@ -3,11 +3,13 @@ name = "ggh-frontend"
 compatibility_date = "2024-03-11"
 
 [build]
-command = "npm install && npm run build"
-output_directory = "dist"
+command = "npm run build"
+publish = "dist"
 
-[env.production]
+[build.environment]
 NODE_VERSION = "18"
+
+[env.production.vars]
 VITE_APP_ENV = "production"
 VITE_API_URL = "https://backendggh.vercel.app"
 VITE_ENABLE_ADMIN_FEATURES = "true"
