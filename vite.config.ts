@@ -14,9 +14,30 @@ export default defineConfig({
     port: 5173,
     proxy: {
       '/api': {
-        target: 'http://localhost:5000',
+        target: process.env.VITE_API_URL || 'http://localhost:5000',
         changeOrigin: true,
+        secure: process.env.NODE_ENV === 'production',
       },
     },
   },
+  build: {
+    outDir: 'dist',
+    sourcemap: true,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'vendor': ['react', 'react-dom', 'react-router-dom'],
+          'ui': ['styled-components', 'framer-motion'],
+          'utils': ['date-fns', 'axios']
+        }
+      }
+    }
+  },
+  // Copy _headers and _redirects to dist during build
+  publicDir: 'public',
+  experimental: {
+    renderBuiltUrl(filename: string) {
+      return `/${filename}`;
+    }
+  }
 });

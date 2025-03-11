@@ -1,0 +1,11 @@
+# Redirect all routes to index.html for client-side routing
+/* /index.html 200
+
+# Preserve query strings
+/* /index.html?:splat 200
+
+# Special routes based on our role-based content management
+/grants/* /index.html 200
+/scholarships/* /index.html 200
+/resources/* /index.html 200
+/dashboard/* /index.html 200

@@ -1,0 +1,30 @@
+# Wrangler configuration for Cloudflare Pages
+name = "ggh-frontend"
+compatibility_date = "2025-03-11"
+
+[build]
+command = "npm install && npm run build"
+publish = "dist"
+
+[build.environment]
+NODE_VERSION = "18"
+
+[env.production]
+VITE_APP_ENV = "production"
+VITE_API_URL = "https://backendggh.vercel.app"
+VITE_ENABLE_ADMIN_FEATURES = "true"
+VITE_ENABLE_PUBLIC_ACCESS = "true"
+VITE_MAX_UPLOAD_SIZE = "5242880"
+VITE_ALLOWED_FILE_TYPES = "pdf,doc,docx,txt"
+VITE_AUTH_ENABLED = "true"
+VITE_GOOGLE_AUTH_ENABLED = "true"
+
+# Routes configuration
+[[routes]]
+pattern = "/api/*"
+forward = "https://backendggh.vercel.app/api/:splat"
+
+[[routes]]
+pattern = "/*"
+forward = "/index.html"
+status = 200
