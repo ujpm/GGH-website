@@ -9,7 +9,7 @@ import fundingRoutes from '../src/routes/fundingRoutes';
 import '../src/models/user.model';
 import '../src/models/content.model';
 
-// Load environment variables
+// Load environment variables .....
 dotenv.config();
 
 // Initialize express

@@ -6,7 +6,7 @@
     "start": "node dist/server.js",
     "dev": "nodemon --exec ts-node server.ts",
     "build": "tsc",
-    "vercel-build": "npm install && tsc",
+    "vercel-build": "tsc",
     "test": "jest",
     "seed": "ts-node src/scripts/seed.ts"
   },

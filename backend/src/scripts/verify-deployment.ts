@@ -1,6 +1,11 @@
 import axios from 'axios';
 
-const BACKEND_URL = 'https://backendggh.vercel.app';
+const BACKEND_URL = process.env.NODE_ENV === 'production' 
+  ? 'https://backendggh.vercel.app'
+  : 'http://localhost:5000';
+
+console.log(`🔍 Testing backend at: ${BACKEND_URL}\n`);
+
 const ENDPOINTS = [
   '/',                  // Health check
   '/api/auth',          // Auth routes
@@ -12,9 +17,12 @@ async function verifyEndpoint(endpoint: string) {
   try {
     const response = await axios.get(`${BACKEND_URL}${endpoint}`);
     console.log(`✅ ${endpoint} - Status: ${response.status}`);
+    if (endpoint === '/') {
+      console.log(`   Response: ${JSON.stringify(response.data)}`);
+    }
     return true;
   } catch (error: any) {
-    console.error(`❌ ${endpoint} - Error:`, error.message);
+    console.error(`❌ ${endpoint} - Error:`, error.response?.status || error.message);
     return false;
   }
 }
