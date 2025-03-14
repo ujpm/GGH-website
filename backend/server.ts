@@ -43,20 +43,7 @@ connectWithRetry().catch(err => {
 
 // Middleware
 const corsOptions = {
-  origin: (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
-    const allowedOrigins = [
-      'https://ggh-website.pages.dev',
-      'https://backendggh.vercel.app',
-      'http://localhost:5173',
-      'http://localhost:5174'
-    ];
-    
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
+  origin: ['http://localhost:5173', 'http://127.0.0.1:62028'],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']

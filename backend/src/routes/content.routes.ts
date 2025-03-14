@@ -5,15 +5,29 @@ import { isAdmin } from '../middleware/admin.middleware';
 
 const router = express.Router();
 
-// All routes require authentication and admin access
-router.use(protect);
-router.use(isAdmin);
+// Public endpoint for API information
+router.get('/', (req, res) => {
+  res.json({
+    status: 'ok',
+    message: 'Content API is running',
+    note: 'Authentication required for content management',
+    endpoints: {
+      getAll: 'GET /all (Protected)',
+      getById: 'GET /:id (Protected)',
+      create: 'POST / (Admin)',
+      update: 'PUT /:id (Admin)',
+      delete: 'DELETE /:id (Admin)'
+    }
+  });
+});
 
-// Content management routes
-router.get('/', contentController.getAll);
-router.get('/:id', contentController.getById);
-router.post('/', contentController.create);
-router.put('/:id', contentController.update);
-router.delete('/:id', contentController.delete);
+// Protected routes
+router.get('/all', protect, contentController.getAll);
+router.get('/:id', protect, contentController.getById);
+
+// Admin-only routes
+router.post('/', protect, isAdmin, contentController.create);
+router.put('/:id', protect, isAdmin, contentController.update);
+router.delete('/:id', protect, isAdmin, contentController.delete);
 
 export default router;

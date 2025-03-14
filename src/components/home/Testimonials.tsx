@@ -1,8 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import styled from 'styled-components';
 import Container from '../common/Container';
 import { FaQuoteLeft, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
-import userExample from 'assets/user-example.webp';
 
 const Section = styled.section`
   padding: 5rem 0;
@@ -35,26 +34,18 @@ const TestimonialsContainer = styled.div`
   overflow: hidden;
 `;
 
-const TestimonialSlider = styled.div<{ transform: string }>`
+const TestimonialSlider = styled.div`
   display: flex;
-  transition: transform 0.5s ease;
-  transform: ${props => props.transform};
+  gap: 2rem;
+  padding: 2rem 1rem;
 `;
 
 const TestimonialCard = styled.div`
-  flex: 0 0 33.333%;
-  padding: 1.5rem;
-  opacity: 0.5;
-  transform: scale(0.9);
-  transition: all 0.5s ease;
+  flex: 0 0 calc(33.333% - 2rem);
+  min-width: 300px;
   
-  &.active {
-    opacity: 1;
-    transform: scale(1);
-  }
-
   @media (max-width: 968px) {
-    flex: 0 0 100%;
+    flex: 0 0 calc(100% - 2rem);
   }
 `;
 
@@ -62,12 +53,16 @@ const CardInner = styled.div`
   background: white;
   padding: 2rem;
   border-radius: 15px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
   position: relative;
-  transition: transform 0.3s ease;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 
   &:hover {
     transform: translateY(-5px);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12);
   }
 
   &::before {
@@ -90,49 +85,32 @@ const QuoteIcon = styled(FaQuoteLeft)`
 `;
 
 const TestimonialText = styled.p`
-  color: #666;
-  line-height: 1.6;
+  color: #444;
+  line-height: 1.8;
   margin-bottom: 1.5rem;
   font-style: italic;
-  font-size: 0.95rem;
+  font-size: 1rem;
+  flex-grow: 1;
 `;
 
 const AuthorInfo = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 1rem;
+  border-top: 1px solid #eee;
+  padding-top: 1.5rem;
+  margin-top: auto;
 `;
-
-const AuthorImage = styled.div`
-  width: 60px;
-  height: 60px;
-  border-radius: 50%;
-  overflow: hidden;
-  border: 3px solid var(--color-primary);
-  
-  img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-`;
-
-const AuthorDetails = styled.div``;
 
 const AuthorName = styled.h4`
   color: var(--color-primary);
   margin: 0;
-  font-size: 1rem;
-  font-family: 'Montserrat', sans-serif;
+  font-size: 1.1rem;
   font-weight: 600;
-  letter-spacing: 0.5px;
+  margin-bottom: 0.5rem;
 `;
 
 const AuthorTitle = styled.p`
   color: #666;
   margin: 0;
-  font-size: 0.85rem;
-  font-family: 'Open Sans', sans-serif;
+  font-size: 0.9rem;
   font-style: italic;
 `;
 
@@ -143,10 +121,10 @@ const NavigationButton = styled.button<{ direction: 'left' | 'right' }>`
   transform: translateY(-50%);
   background: white;
   border: none;
-  width: 40px;
-  height: 40px;
+  width: 50px;
+  height: 50px;
   border-radius: 50%;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -161,6 +139,16 @@ const NavigationButton = styled.button<{ direction: 'left' | 'right' }>`
     transform: translateY(-50%) scale(1.1);
   }
 
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    &:hover {
+      background: white;
+      color: var(--color-primary);
+      transform: translateY(-50%);
+    }
+  }
+
   @media (max-width: 968px) {
     ${props => props.direction}: 10px;
   }
@@ -169,105 +157,87 @@ const NavigationButton = styled.button<{ direction: 'left' | 'right' }>`
 const testimonials = [
   {
     id: 1,
-    text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. The platform exceeded all my expectations with its intuitive interface!",
-    author: "Alex Morgan",
-    title: "Project Lead, Innovation Hub",
-    image: userExample
+    text: "The Global Grants Hub's mentorship and resources have helped us scale our projects and reach more communities in need. We are grateful for their continuous support and dedication.",
+    author: "Dr. Jeremiah Mugisha",
+    title: "Chief Executive Officer, Mission of Hope Initiative (MOHI)"
   },
   {
     id: 2,
-    text: "Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. A game-changing resource for our organization.",
-    author: "Sam Wilson",
-    title: "Director, Future Forward",
-    image: userExample
+    text: "The Global Grants Hub has been instrumental in connecting us with the right funding opportunities and resources. Through their support, we have successfully secured over $500,000 in funding, significantly advancing our initiatives and empowering us to make a greater impact.",
+    author: "Dr. Kiviiri Enock",
+    title: "Chairperson BoD, Cairo Youth Empowerment Initiative (CYEI)"
   },
   {
     id: 3,
-    text: "Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
-    author: "Jordan Lee",
-    title: "Founder, Tech Solutions",
-    image: userExample
+    text: "Being a part of the Global Grants Hub community has empowered us to achieve our goals and secure funding for our initiatives. Their platform and support are truly exceptional.",
+    author: "Mr. Emeka Obi",
+    title: "Chief Executive Officer, Nigerian Education Development Network (NEDN)"
   },
   {
     id: 4,
-    text: "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.",
-    author: "Taylor Reed",
-    title: "Program Manager, Future Initiatives",
-    image: userExample
+    text: "Through the Global Grants Hub, we've been able to enhance our educational programs and infrastructure. Their expertise in grant writing and strategic planning has been invaluable.",
+    author: "Mr. Isabirye Steven James",
+    title: "Executive Director, Wanyange Treasure Junior School - Jinja"
   },
   {
     id: 5,
-    text: "Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
-    author: "Casey Kim",
-    title: "Executive Director, Innovation Lab",
-    image: userExample
+    text: "The Global Grants Hub has played a pivotal role in supporting the EmpowerHER project. Their resources and guidance have enabled us to empower more adolescent girls to access quality education and overcome barriers. Through their support, we have successfully received over $5,000 in funding.",
+    author: "Nantaba Norah Jovia",
+    title: "Student, Mityana Trinity College & Leader of EmpowerHER Project"
   }
 ];
 
 const Testimonials = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [autoPlay, setAutoPlay] = useState(true);
-
-  useEffect(() => {
-    let interval: NodeJS.Timeout;
-    if (autoPlay) {
-      interval = setInterval(() => {
-        setCurrentIndex((prev) => (prev + 1) % testimonials.length);
-      }, 5000);
-    }
-    return () => clearInterval(interval);
-  }, [autoPlay]);
+  const itemsPerPage = window.innerWidth <= 968 ? 1 : 3;
+  const maxIndex = testimonials.length - itemsPerPage;
 
   const handlePrev = () => {
-    setAutoPlay(false);
-    setCurrentIndex((prev) => 
-      prev === 0 ? testimonials.length - 1 : prev - 1
-    );
+    setCurrentIndex(prev => Math.max(0, prev - 1));
   };
 
   const handleNext = () => {
-    setAutoPlay(false);
-    setCurrentIndex((prev) => 
-      (prev + 1) % testimonials.length
-    );
-  };
-
-  const getTransform = () => {
-    const baseTransform = -currentIndex * 33.333;
-    return `translateX(${baseTransform}%)`;
+    setCurrentIndex(prev => Math.min(maxIndex, prev + 1));
   };
 
   return (
     <Section>
       <Container>
-        <SectionTitle>What Others Say About GGH</SectionTitle>
+        <SectionTitle>Success Stories</SectionTitle>
         <TestimonialsContainer>
-          <TestimonialSlider transform={getTransform()}>
-            {testimonials.map((testimonial, index) => (
-              <TestimonialCard 
+          <TestimonialSlider
+            style={{
+              transform: `translateX(-${currentIndex * (100 / itemsPerPage)}%)`
+            }}
+          >
+            {testimonials.map((testimonial) => (
+              <TestimonialCard
                 key={testimonial.id}
-                className={index === currentIndex ? 'active' : ''}
               >
                 <CardInner>
                   <QuoteIcon />
                   <TestimonialText>{testimonial.text}</TestimonialText>
                   <AuthorInfo>
-                    <AuthorImage>
-                      <img src={testimonial.image} alt={testimonial.author} />
-                    </AuthorImage>
-                    <AuthorDetails>
-                      <AuthorName>{testimonial.author}</AuthorName>
-                      <AuthorTitle>{testimonial.title}</AuthorTitle>
-                    </AuthorDetails>
+                    <AuthorName>{testimonial.author}</AuthorName>
+                    <AuthorTitle>{testimonial.title}</AuthorTitle>
                   </AuthorInfo>
                 </CardInner>
               </TestimonialCard>
             ))}
           </TestimonialSlider>
-          <NavigationButton direction="left" onClick={handlePrev}>
+
+          <NavigationButton
+            direction="left"
+            onClick={handlePrev}
+            disabled={currentIndex === 0}
+          >
             <FaChevronLeft />
           </NavigationButton>
-          <NavigationButton direction="right" onClick={handleNext}>
+          <NavigationButton
+            direction="right"
+            onClick={handleNext}
+            disabled={currentIndex >= maxIndex}
+          >
             <FaChevronRight />
           </NavigationButton>
         </TestimonialsContainer>

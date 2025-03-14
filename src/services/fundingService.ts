@@ -1,21 +1,44 @@
 import axios from 'axios';
 import { FundingCall, FundingFilters } from '../types/grants';
+import { API_URL, API_ENDPOINTS } from '../config/api';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+// Create axios instance with default config
+const api = axios.create({
+  baseURL: API_URL,
+  withCredentials: true,
+  headers: {
+    'Content-Type': 'application/json'
+  }
+});
+
+// Add response interceptor for better error handling
+api.interceptors.response.use(
+  response => response,
+  error => {
+    console.error('API Error:', {
+      url: error.config?.url,
+      method: error.config?.method,
+      status: error.response?.status,
+      message: error.message
+    });
+    return Promise.reject(error);
+  }
+);
 
 export async function getFundingCalls(filters?: FundingFilters): Promise<FundingCall[]> {
   try {
-    const response = await axios.get(`${API_BASE_URL}/funding-calls`, { params: filters });
-    return response.data.calls || [];
+    const response = await api.get(API_ENDPOINTS.funding.list, { params: filters });
+    // Handle both array and paginated response formats
+    return Array.isArray(response.data) ? response.data : response.data.calls || [];
   } catch (error) {
     console.error('Error fetching funding calls:', error);
-    return [];
+    throw error;
   }
 }
 
 export async function createFundingCall(call: Omit<FundingCall, 'id' | 'createdAt' | 'updatedAt'>): Promise<FundingCall> {
   const token = localStorage.getItem('token');
-  const response = await axios.post(`${API_BASE_URL}/funding-calls`, call, {
+  const response = await api.post(API_ENDPOINTS.funding.create, call, {
     headers: {
       Authorization: `Bearer ${token}`,
     },
@@ -25,7 +48,7 @@ export async function createFundingCall(call: Omit<FundingCall, 'id' | 'createdA
 
 export async function updateFundingCall(id: string, call: Partial<FundingCall>): Promise<FundingCall> {
   const token = localStorage.getItem('token');
-  const response = await axios.put(`${API_BASE_URL}/funding-calls/${id}`, call, {
+  const response = await api.put(API_ENDPOINTS.funding.update(id), call, {
     headers: {
       Authorization: `Bearer ${token}`,
     },
@@ -35,7 +58,7 @@ export async function updateFundingCall(id: string, call: Partial<FundingCall>):
 
 export async function deleteFundingCall(id: string): Promise<void> {
   const token = localStorage.getItem('token');
-  await axios.delete(`${API_BASE_URL}/funding-calls/${id}`, {
+  await api.delete(API_ENDPOINTS.funding.delete(id), {
     headers: {
       Authorization: `Bearer ${token}`,
     },

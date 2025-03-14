@@ -39,6 +39,10 @@ export const getFundingCalls = async (req: Request, res: Response) => {
     const sort: any = {};
     sort[sortBy as string] = sortOrder === 'desc' ? -1 : 1;
 
+    // First check if collection exists and has documents
+    const collectionExists = await FundingCall.exists({});
+    console.log(' Collection exists:', !!collectionExists);
+
     const [calls, total] = await Promise.all([
       FundingCall.find(query)
         .sort(sort)
@@ -49,6 +53,36 @@ export const getFundingCalls = async (req: Request, res: Response) => {
     ]);
 
     console.log(` Found ${total} total calls, returning ${calls.length} calls`);
+
+    if (total === 0 && !collectionExists) {
+      // If no documents exist, try to seed some sample data
+      try {
+        const sampleCall = new FundingCall({
+          title: 'Sample Research Grant',
+          type: 'grant',
+          organization: 'Global Research Foundation',
+          description: 'A sample grant for testing purposes',
+          deadline: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days from now
+          status: 'open',
+          eligibility: {
+            criteria: ['Must be a researcher', 'Must have a PhD'],
+            requirements: ['Research proposal', 'CV']
+          },
+          fundingInfo: {
+            amount: '50000',
+            currency: 'USD',
+            duration: '12 months'
+          },
+          applicationUrl: 'https://example.com/apply',
+          featured: true
+        });
+        await sampleCall.save();
+        console.log(' Created sample funding call');
+        return res.json([sampleCall]);
+      } catch (seedError) {
+        console.error(' Error seeding sample data:', seedError);
+      }
+    }
 
     // Update status based on deadline for all calls
     const updatedCalls = calls.map(call => {
