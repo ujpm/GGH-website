@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { AuthRequest } from '../middleware/auth';
-import FundingCall, { IFundingCall } from '../models/FundingCall';
+import FundingCall, { IFundingCall } from '../src/models/FundingCall';
 
 // Get all funding calls with filtering
 export const getFundingCalls = async (req: Request, res: Response) => {

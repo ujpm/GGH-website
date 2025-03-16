@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { toast } from 'react-hot-toast';
+import { API_URL } from '../../config/api';
+import { useFunding } from '../../context/FundingContext';
 
 const Container = styled.div`
   padding: 2rem;
@@ -124,6 +126,24 @@ const StatusBadge = styled.span<{ status: string }>`
   color: ${props => props.status === 'closing_soon' ? '#000' : '#fff'};
 `;
 
+const LoadingSpinner = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 2rem;
+  font-size: 1.2rem;
+  color: var(--color-primary);
+`;
+
+const ErrorMessage = styled.div`
+  padding: 1rem;
+  margin: 1rem 0;
+  background-color: #fff3f3;
+  border: 1px solid #dc3545;
+  border-radius: 4px;
+  color: #dc3545;
+`;
+
 interface FundingCall {
   _id: string;
   title: string;
@@ -136,35 +156,17 @@ interface FundingCall {
 const ContentManagement: React.FC = () => {
   const navigate = useNavigate();
   const [showModal, setShowModal] = useState(false);
-  const [content, setContent] = useState<FundingCall[]>([]);
+  const { state: { calls, loading, error }, refetchCalls } = useFunding();
 
   useEffect(() => {
-    fetchContent();
+    refetchCalls();
   }, []);
-
-  const fetchContent = async () => {
-    try {
-      const response = await fetch('http://localhost:5000/api/funding-calls', {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        }
-      });
-      if (!response.ok) {
-        throw new Error('Failed to fetch content');
-      }
-      const data = await response.json();
-      setContent(data.calls || []);
-    } catch (error) {
-      console.error('Error fetching content:', error);
-      toast.error('Failed to fetch content');
-    }
-  };
 
   const handleDelete = async (id: string) => {
     if (!window.confirm('Are you sure you want to delete this item?')) return;
 
     try {
-      const response = await fetch(`http://localhost:5000/api/funding-calls/${id}`, {
+      const response = await fetch(`${API_URL}/funding/${id}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
@@ -176,7 +178,7 @@ const ContentManagement: React.FC = () => {
       }
 
       toast.success('Content deleted successfully');
-      fetchContent();
+      refetchCalls();
     } catch (error) {
       console.error('Error deleting content:', error);
       toast.error('Failed to delete content');
@@ -188,6 +190,25 @@ const ContentManagement: React.FC = () => {
     navigate('/dashboard/create', { state: { type } });
   };
 
+  if (loading) {
+    return (
+      <Container>
+        <LoadingSpinner>Loading content...</LoadingSpinner>
+      </Container>
+    );
+  }
+
+  if (error) {
+    return (
+      <Container>
+        <ErrorMessage>
+          Error loading content: {error}
+          <button onClick={refetchCalls}>Try Again</button>
+        </ErrorMessage>
+      </Container>
+    );
+  }
+
   return (
     <Container>
       <Header>
@@ -198,8 +219,12 @@ const ContentManagement: React.FC = () => {
       </Header>
 
       {showModal && (
-        <Modal onClick={() => setShowModal(false)}>
-          <ModalContent onClick={e => e.stopPropagation()}>
+        <Modal onClick={(e) => {
+          if (e.target === e.currentTarget) {
+            setShowModal(false);
+          }
+        }}>
+          <ModalContent>
             <h2>Select Content Type</h2>
             <TypeSelection>
               <TypeCard onClick={() => handleTypeSelect('grant')}>
@@ -208,7 +233,7 @@ const ContentManagement: React.FC = () => {
               </TypeCard>
               <TypeCard onClick={() => handleTypeSelect('scholarship')}>
                 <h3>Scholarship</h3>
-                <p>Create a new scholarship opportunity</p>
+                <p>Create a new scholarship listing</p>
               </TypeCard>
               <TypeCard onClick={() => handleTypeSelect('resource')}>
                 <h3>Resource</h3>
@@ -219,45 +244,49 @@ const ContentManagement: React.FC = () => {
         </Modal>
       )}
 
-      <ContentTable>
-        <thead>
-          <tr>
-            <Th>Title</Th>
-            <Th>Type</Th>
-            <Th>Organization</Th>
-            <Th>Status</Th>
-            <Th>Actions</Th>
-          </tr>
-        </thead>
-        <tbody>
-          {content.map(item => (
-            <tr key={item._id}>
-              <Td>{item.title}</Td>
-              <Td style={{ textTransform: 'capitalize' }}>{item.type}</Td>
-              <Td>{item.organization}</Td>
-              <Td>
-                <StatusBadge status={item.status}>
-                  {item.status.replace('_', ' ')}
-                </StatusBadge>
-              </Td>
-              <Td>
-                <ActionButton
-                  className="edit"
-                  onClick={() => navigate(`/dashboard/edit/${item._id}`)}
-                >
-                  Edit
-                </ActionButton>
-                <ActionButton
-                  className="delete"
-                  onClick={() => handleDelete(item._id)}
-                >
-                  Delete
-                </ActionButton>
-              </Td>
+      {calls.length === 0 ? (
+        <p>No content available. Click "Add New Content" to create some.</p>
+      ) : (
+        <ContentTable>
+          <thead>
+            <tr>
+              <Th>Title</Th>
+              <Th>Type</Th>
+              <Th>Organization</Th>
+              <Th>Status</Th>
+              <Th>Actions</Th>
             </tr>
-          ))}
-        </tbody>
-      </ContentTable>
+          </thead>
+          <tbody>
+            {calls.map(call => (
+              <tr key={call._id}>
+                <Td>{call.title}</Td>
+                <Td style={{ textTransform: 'capitalize' }}>{call.type}</Td>
+                <Td>{call.organization}</Td>
+                <Td>
+                  <StatusBadge status={call.status}>
+                    {call.status.replace('_', ' ')}
+                  </StatusBadge>
+                </Td>
+                <Td>
+                  <ActionButton
+                    className="edit"
+                    onClick={() => navigate(`/dashboard/edit/${call._id}`)}
+                  >
+                    Edit
+                  </ActionButton>
+                  <ActionButton
+                    className="delete"
+                    onClick={() => handleDelete(call._id)}
+                  >
+                    Delete
+                  </ActionButton>
+                </Td>
+              </tr>
+            ))}
+          </tbody>
+        </ContentTable>
+      )}
     </Container>
   );
 };
