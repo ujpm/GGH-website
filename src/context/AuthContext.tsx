@@ -33,6 +33,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       checkAuth();
     } else {
       setLoading(false);
+      setUser(null);
     }
   }, []);
 
@@ -41,6 +42,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const token = localStorage.getItem('token');
       if (!token) {
         setUser(null);
+        setLoading(false);
         return;
       }
 
@@ -50,8 +52,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         },
       });
 
+      if (!response.data?.data) {
+        throw new Error('Invalid response format');
+      }
+
       setUser(response.data.data);
     } catch (error) {
+      console.error('Auth check failed:', error);
       localStorage.removeItem('token');
       setUser(null);
     } finally {
@@ -70,6 +77,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const { token, user } = response.data.data;
       localStorage.setItem('token', token);
       setUser(user);
+      await checkAuth(); // Verify the token immediately
     } catch (error: any) {
       setError(error.response?.data?.message || 'An error occurred');
       throw error;

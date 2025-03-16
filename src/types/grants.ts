@@ -1,6 +1,6 @@
-export type FundingType = 'grant' | 'scholarship' | 'resource';
+export type FundingType = 'grant' | 'scholarship';
 
-export type FundingStatus = 'open' | 'closing_soon' | 'closed';
+export type FundingStatus = 'open' | 'closed';
 
 export interface FundingEligibility {
   criteria: string[];
@@ -8,10 +8,8 @@ export interface FundingEligibility {
 }
 
 export interface FundingInformation {
-  amount?: string;
+  amount: string;
   currency?: string;
-  duration?: string;
-  type?: string;
 }
 
 export interface FundingContact {
@@ -37,7 +35,7 @@ export interface FundingCall {
   createdAt: string;
   updatedAt: string;
   publishedAt?: string;
-  featured?: boolean;
+  featured: boolean;
   tags?: string[];
 }
 
@@ -46,4 +44,14 @@ export interface FundingFilters {
   status?: FundingStatus;
   featured?: boolean;
   tags?: string[];
+}
+
+export interface FundingResponse {
+  calls: FundingCall[];
+  pagination: {
+    total: number;
+    page: number;
+    pages: number;
+    limit: number;
+  };
 }

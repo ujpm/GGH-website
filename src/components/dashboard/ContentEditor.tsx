@@ -232,19 +232,23 @@ const ContentEditor: React.FC = () => {
     setError(null);
 
     try {
-      // Ensure fundingInfo is properly structured
-      const submissionData = {
+      const cleanedData = {
         ...formData,
         fundingInfo: {
-          amount: formData.fundingInfo?.amount?.toString().replace(/^\$/, '') || '', // Remove $ if present
+          amount: formData.fundingInfo?.amount?.toString().trim().replace(/^\$/, '') || '',
           currency: formData.fundingInfo?.currency || 'USD',
-          duration: formData.fundingInfo?.duration?.toString() || '',
-          type: formData.fundingInfo?.type?.toString() || '',
-          budget_limit: formData.fundingInfo?.budget_limit?.toString() || ''
-        }
+          duration: formData.fundingInfo?.duration?.toString().trim() || '',
+          type: formData.fundingInfo?.type?.toString().trim() || '',
+          budget_limit: formData.fundingInfo?.budget_limit?.toString().trim() || ''
+        },
+        eligibility: {
+          criteria: formData.eligibility.criteria.filter(c => c.trim() !== ''),
+          ineligible: formData.eligibility.ineligible.filter(c => c.trim() !== '')
+        },
+        tags: formData.tags.filter(t => t.trim() !== '')
       };
 
-      const url = id ? `/api/funding-calls/${id}` : '/api/funding-calls';
+      const url = id ? `http://localhost:5000/api/funding-calls/${id}` : 'http://localhost:5000/api/funding-calls';
       const method = id ? 'PUT' : 'POST';
 
       const response = await fetch(url, {
@@ -253,24 +257,13 @@ const ContentEditor: React.FC = () => {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         },
-        body: JSON.stringify(submissionData)
+        body: JSON.stringify(cleanedData)
       });
 
-      const data = await response.json();
+      const responseData = await response.json();
 
       if (!response.ok) {
-        const errorMessage = data.error || 'Failed to save content';
-        if (data.details) {
-          // Handle validation errors
-          const detailsStr = Object.entries(data.details)
-            .map(([field, msg]) => `${field}: ${msg}`)
-            .join(', ');
-          setError(`${errorMessage}: ${detailsStr}`);
-        } else {
-          setError(errorMessage);
-        }
-        toast.error(errorMessage);
-        return;
+        throw new Error(responseData.message || 'Failed to save content');
       }
 
       toast.success(`Successfully ${id ? 'updated' : 'created'} content`);

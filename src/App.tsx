@@ -5,8 +5,8 @@ import { Toaster } from 'react-hot-toast';
 import { AuthProvider } from './context/AuthContext';
 import { FundingProvider } from './context/FundingContext';
 import AdminRoute from './components/auth/AdminRoute';
-import Navbar from './components/common/Navbar';
-import Footer from './components/common/Footer';
+import Layout from './components/layout/Layout';
+import GlobalStyles from './styles/GlobalStyles';
 import Home from './pages/Home';
 import About from './pages/About';
 import Login from './components/auth/Login';
@@ -28,8 +28,8 @@ function App() {
         <AuthProvider>
           <FundingProvider>
             <Router>
-              <div className="App">
-                <Navbar />
+              <GlobalStyles />
+              <Layout>
                 <Routes>
                   {/* Public Routes */}
                   <Route path="/" element={<Home />} />
@@ -68,9 +68,19 @@ function App() {
                     }
                   />
                 </Routes>
-                <Footer />
-                <Toaster position="top-right" />
-              </div>
+                <Toaster 
+                  position="top-right"
+                  toastOptions={{
+                    duration: 4000,
+                    style: {
+                      background: 'var(--background)',
+                      color: 'var(--text)',
+                      boxShadow: 'var(--box-shadow)',
+                      borderRadius: 'var(--border-radius)',
+                    },
+                  }}
+                />
+              </Layout>
             </Router>
           </FundingProvider>
         </AuthProvider>

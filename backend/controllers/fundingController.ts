@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { AuthRequest } from '../middleware/auth';
-import FundingCall from '../src/models/FundingCall';
+import FundingCall, { IFundingCall } from '../models/FundingCall';
 
 // Get all funding calls with filtering
 export const getFundingCalls = async (req: Request, res: Response) => {
@@ -16,8 +16,6 @@ export const getFundingCalls = async (req: Request, res: Response) => {
       sortOrder = 'asc'
     } = req.query;
 
-    console.log(' Fetching funding calls with filters:', { type, status, featured, search });
-
     const query: any = {};
     
     // Apply filters
@@ -30,18 +28,12 @@ export const getFundingCalls = async (req: Request, res: Response) => {
       query.$text = { $search: search as string };
     }
 
-    console.log(' MongoDB query:', JSON.stringify(query, null, 2));
-
     // Calculate pagination
     const skip = (Number(page) - 1) * Number(limit);
 
     // Build sort object
     const sort: any = {};
     sort[sortBy as string] = sortOrder === 'desc' ? -1 : 1;
-
-    // First check if collection exists and has documents
-    const collectionExists = await FundingCall.exists({});
-    console.log(' Collection exists:', !!collectionExists);
 
     const [calls, total] = await Promise.all([
       FundingCall.find(query)
@@ -52,10 +44,8 @@ export const getFundingCalls = async (req: Request, res: Response) => {
       FundingCall.countDocuments(query)
     ]);
 
-    console.log(` Found ${total} total calls, returning ${calls.length} calls`);
-
-    if (total === 0 && !collectionExists) {
-      // If no documents exist, try to seed some sample data
+    // If no calls exist, create a sample one
+    if (total === 0) {
       try {
         const sampleCall = new FundingCall({
           title: 'Sample Research Grant',
@@ -64,46 +54,29 @@ export const getFundingCalls = async (req: Request, res: Response) => {
           description: 'A sample grant for testing purposes',
           deadline: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days from now
           status: 'open',
-          eligibility: {
-            criteria: ['Must be a researcher', 'Must have a PhD'],
-            requirements: ['Research proposal', 'CV']
-          },
           fundingInfo: {
             amount: '50000',
-            currency: 'USD',
-            duration: '12 months'
+            currency: 'USD'
           },
-          applicationUrl: 'https://example.com/apply',
           featured: true
         });
         await sampleCall.save();
-        console.log(' Created sample funding call');
-        return res.json([sampleCall]);
+        return res.json({
+          calls: [sampleCall],
+          pagination: {
+            total: 1,
+            page: 1,
+            pages: 1,
+            limit: Number(limit)
+          }
+        });
       } catch (seedError) {
-        console.error(' Error seeding sample data:', seedError);
+        console.error('Error seeding sample data:', seedError);
       }
     }
 
-    // Update status based on deadline for all calls
-    const updatedCalls = calls.map(call => {
-      const now = new Date();
-      const deadline = new Date(call.deadline);
-      const daysUntilDeadline = Math.ceil((deadline.getTime() - now.getTime()) / (1000 * 3600 * 24));
-
-      let status = call.status;
-      if (daysUntilDeadline <= 0) {
-        status = 'closed';
-      } else if (daysUntilDeadline <= 7) {
-        status = 'closing_soon';
-      } else {
-        status = 'open';
-      }
-
-      return { ...call, status };
-    });
-
     return res.json({
-      calls: updatedCalls,
+      calls,
       pagination: {
         total,
         page: Number(page),
@@ -112,7 +85,7 @@ export const getFundingCalls = async (req: Request, res: Response) => {
       }
     });
   } catch (error) {
-    console.error(' Error fetching funding calls:', error);
+    console.error('Error fetching funding calls:', error);
     return res.status(500).json({ error: 'Failed to fetch funding calls' });
   }
 };
@@ -134,28 +107,19 @@ export const getFundingCall = async (req: Request, res: Response) => {
 // Create a new funding call
 export const createFundingCall = async (req: AuthRequest, res: Response) => {
   try {
-    // Ensure fundingInfo has all required fields with defaults
-    const fundingInfo = {
-      amount: (req.body.fundingInfo?.amount || '').toString().replace(/^\$/, ''), // Remove $ if present
-      currency: req.body.fundingInfo?.currency || 'USD',
-      duration: (req.body.fundingInfo?.duration || '').toString(),
-      type: (req.body.fundingInfo?.type || '').toString(),
-      budget_limit: (req.body.fundingInfo?.budget_limit || '').toString()
+    const fundingCall: Partial<IFundingCall> = {
+      ...req.body,
+      fundingInfo: {
+        amount: req.body.fundingInfo?.amount?.toString().replace(/^\$/, '') || '0', // Remove $ if present
+        currency: req.body.fundingInfo?.currency || 'USD'
+      }
     };
-
-    const { fundingInfo: _, ...otherData } = req.body;
     
-    const newCall = new FundingCall({
-      ...otherData,
-      fundingInfo,
-      publishedAt: new Date()
-    });
-
+    const newCall = new FundingCall(fundingCall);
     const savedCall = await newCall.save();
     return res.status(201).json(savedCall);
   } catch (error: any) {
     console.warn('Error creating funding call:', error);
-    // Return detailed validation errors if available
     if (error.name === 'ValidationError') {
       return res.status(400).json({ 
         error: 'Validation failed',
@@ -176,7 +140,13 @@ export const updateFundingCall = async (req: AuthRequest, res: Response) => {
   try {
     const call = await FundingCall.findByIdAndUpdate(
       req.params.id,
-      { ...req.body, updatedAt: new Date() },
+      { 
+        ...req.body,
+        fundingInfo: {
+          amount: req.body.fundingInfo?.amount?.toString().replace(/^\$/, '') || '0',
+          currency: req.body.fundingInfo?.currency || 'USD'
+        }
+      },
       { new: true, runValidators: true }
     );
 
@@ -208,41 +178,19 @@ export const deleteFundingCall = async (req: AuthRequest, res: Response) => {
 // Get funding call statistics
 export const getFundingStats = async (_req: Request, res: Response) => {
   try {
-    const stats = await FundingCall.aggregate([
-      {
-        $facet: {
-          byType: [
-            { $group: { _id: '$type', count: { $sum: 1 } } }
-          ],
-          byStatus: [
-            { $group: { _id: '$status', count: { $sum: 1 } } }
-          ],
-          totalAmount: [
-            {
-              $group: {
-                _id: null,
-                total: {
-                  $sum: {
-                    $cond: [
-                      { $and: [
-                        { $eq: ['$status', 'open'] },
-                        { $ne: ['$fundingInfo.amount', null] }
-                      ]},
-                      { $toDouble: '$fundingInfo.amount' },
-                      0
-                    ]
-                  }
-                }
-              }
-            }
-          ]
-        }
-      }
+    const [totalCalls, openCalls, closedCalls] = await Promise.all([
+      FundingCall.countDocuments(),
+      FundingCall.countDocuments({ status: 'open' }),
+      FundingCall.countDocuments({ status: 'closed' })
     ]);
 
-    return res.json(stats[0]);
+    return res.json({
+      total: totalCalls,
+      open: openCalls,
+      closed: closedCalls
+    });
   } catch (error) {
-    console.error('Error getting funding stats:', error);
-    return res.status(500).json({ error: 'Failed to get funding stats' });
+    console.error('Error fetching funding stats:', error);
+    return res.status(500).json({ error: 'Failed to fetch funding stats' });
   }
 };

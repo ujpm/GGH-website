@@ -144,15 +144,16 @@ const ContentManagement: React.FC = () => {
 
   const fetchContent = async () => {
     try {
-      const response = await fetch('/api/funding-calls', {
+      const response = await fetch('http://localhost:5000/api/funding-calls', {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
       });
-      if (response.ok) {
-        const data = await response.json();
-        setContent(data.calls || []);
+      if (!response.ok) {
+        throw new Error('Failed to fetch content');
       }
+      const data = await response.json();
+      setContent(data.calls || []);
     } catch (error) {
       console.error('Error fetching content:', error);
       toast.error('Failed to fetch content');
@@ -163,19 +164,19 @@ const ContentManagement: React.FC = () => {
     if (!window.confirm('Are you sure you want to delete this item?')) return;
 
     try {
-      const response = await fetch(`/api/funding-calls/${id}`, {
+      const response = await fetch(`http://localhost:5000/api/funding-calls/${id}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
       });
 
-      if (response.ok) {
-        toast.success('Content deleted successfully');
-        fetchContent();
-      } else {
-        toast.error('Failed to delete content');
+      if (!response.ok) {
+        throw new Error('Failed to delete content');
       }
+
+      toast.success('Content deleted successfully');
+      fetchContent();
     } catch (error) {
       console.error('Error deleting content:', error);
       toast.error('Failed to delete content');

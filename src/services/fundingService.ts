@@ -1,10 +1,10 @@
 import axios from 'axios';
-import { FundingCall, FundingFilters } from '../types/grants';
+import { FundingCall, FundingFilters, FundingResponse } from '../types/grants';
 import { API_URL, API_ENDPOINTS } from '../config/api';
 
 // Create axios instance with default config
 const api = axios.create({
-  baseURL: API_URL,
+  baseURL: `${API_URL}/api`,
   withCredentials: true,
   headers: {
     'Content-Type': 'application/json'
@@ -25,20 +25,19 @@ api.interceptors.response.use(
   }
 );
 
-export async function getFundingCalls(filters?: FundingFilters): Promise<FundingCall[]> {
+export async function getFundingCalls(filters?: FundingFilters): Promise<FundingResponse> {
   try {
-    const response = await api.get(API_ENDPOINTS.funding.list, { params: filters });
-    // Handle both array and paginated response formats
-    return Array.isArray(response.data) ? response.data : response.data.calls || [];
+    const response = await api.get<FundingResponse>(API_ENDPOINTS.funding.list, { params: filters });
+    return response.data;
   } catch (error) {
     console.error('Error fetching funding calls:', error);
     throw error;
   }
 }
 
-export async function createFundingCall(call: Omit<FundingCall, 'id' | 'createdAt' | 'updatedAt'>): Promise<FundingCall> {
+export async function createFundingCall(call: Omit<FundingCall, '_id'>): Promise<FundingCall> {
   const token = localStorage.getItem('token');
-  const response = await api.post(API_ENDPOINTS.funding.create, call, {
+  const response = await api.post<FundingCall>(API_ENDPOINTS.funding.create, call, {
     headers: {
       Authorization: `Bearer ${token}`,
     },
@@ -48,7 +47,7 @@ export async function createFundingCall(call: Omit<FundingCall, 'id' | 'createdA
 
 export async function updateFundingCall(id: string, call: Partial<FundingCall>): Promise<FundingCall> {
   const token = localStorage.getItem('token');
-  const response = await api.put(API_ENDPOINTS.funding.update(id), call, {
+  const response = await api.put<FundingCall>(API_ENDPOINTS.funding.update(id), call, {
     headers: {
       Authorization: `Bearer ${token}`,
     },
@@ -79,25 +78,9 @@ export function validateFundingCall(call: Partial<FundingCall>): string[] {
     errors.push('Deadline must be in the future');
   }
 
-  // Validate eligibility
-  if (!call.eligibility?.criteria?.length) {
-    errors.push('At least one eligibility criterion is required');
-  }
-
   // Validate funding information
-  if (!call.fundingInfo?.amount && !call.fundingInfo?.type) {
-    errors.push('Either funding amount or type must be specified');
-  }
-
-  // Validate application URL
-  if (!call.applicationUrl) {
-    errors.push('Application URL is required');
-  } else {
-    try {
-      new URL(call.applicationUrl);
-    } catch {
-      errors.push('Invalid application URL');
-    }
+  if (!call.fundingInfo?.amount) {
+    errors.push('Funding amount is required');
   }
 
   return errors;

@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useReducer, useEffect } from 'react';
-import { FundingCall, FundingFilters, FundingStatus } from '../types/grants';
+import { FundingCall, FundingFilters, FundingResponse } from '../types/grants';
 import { getFundingCalls } from '../services/fundingService';
 import { toast } from 'react-toastify';
 
@@ -8,10 +8,16 @@ interface FundingState {
   filters: FundingFilters;
   loading: boolean;
   error: string | null;
+  pagination?: {
+    total: number;
+    page: number;
+    pages: number;
+    limit: number;
+  };
 }
 
 type FundingAction =
-  | { type: 'SET_CALLS'; payload: FundingCall[] }
+  | { type: 'SET_FUNDING_DATA'; payload: { calls: FundingCall[]; pagination?: FundingState['pagination'] } }
   | { type: 'ADD_CALL'; payload: FundingCall }
   | { type: 'UPDATE_CALL'; payload: FundingCall }
   | { type: 'DELETE_CALL'; payload: string }
@@ -22,7 +28,7 @@ type FundingAction =
 const initialState: FundingState = {
   calls: [],
   filters: {},
-  loading: true, // Start with loading true
+  loading: true,
   error: null,
 };
 
@@ -34,8 +40,13 @@ const FundingContext = createContext<{
 
 function fundingReducer(state: FundingState, action: FundingAction): FundingState {
   switch (action.type) {
-    case 'SET_CALLS':
-      return { ...state, calls: action.payload, error: null };
+    case 'SET_FUNDING_DATA':
+      return { 
+        ...state, 
+        calls: action.payload.calls,
+        pagination: action.payload.pagination,
+        error: null 
+      };
     case 'ADD_CALL':
       return { ...state, calls: [...state.calls, action.payload], error: null };
     case 'UPDATE_CALL':
@@ -69,13 +80,34 @@ export function FundingProvider({ children }: { children: React.ReactNode }) {
   const fetchFundingCalls = async () => {
     try {
       dispatch({ type: 'SET_LOADING', payload: true });
-      dispatch({ type: 'SET_ERROR', payload: null }); // Clear any previous errors
-      const calls = await getFundingCalls(state.filters);
-      dispatch({ type: 'SET_CALLS', payload: calls });
-    } catch (error) {
+      dispatch({ type: 'SET_ERROR', payload: null });
+      
+      const response = await getFundingCalls(state.filters);
+      
+      // Extract calls and pagination from response
+      const { calls = [], pagination } = response as FundingResponse;
+      
+      // Validate each funding call has required fields
+      const validCalls = calls.filter((call: FundingCall) => {
+        if (!call?._id || !call?.title || !call?.organization || !call?.fundingInfo?.amount) {
+          console.warn('Invalid funding call data:', call);
+          return false;
+        }
+        return true;
+      });
+
+      dispatch({ 
+        type: 'SET_FUNDING_DATA', 
+        payload: { 
+          calls: validCalls,
+          pagination 
+        } 
+      });
+    } catch (error: any) {
+      const errorMessage = error?.response?.data?.message || error?.message || 'Failed to fetch funding calls';
       console.error('Failed to fetch funding calls:', error);
-      dispatch({ type: 'SET_ERROR', payload: 'Failed to fetch funding calls. Please try again later.' });
-      toast.error('Failed to fetch funding calls. Please try again later.');
+      dispatch({ type: 'SET_ERROR', payload: errorMessage });
+      toast.error(errorMessage);
     } finally {
       dispatch({ type: 'SET_LOADING', payload: false });
     }
@@ -89,30 +121,25 @@ export function FundingProvider({ children }: { children: React.ReactNode }) {
   // Auto-update funding status based on deadlines
   useEffect(() => {
     const updateStatus = () => {
-      if (state.loading || state.error) return; // Don't update if loading or error
+      if (state.loading || state.error) return;
 
       const now = new Date();
       const updatedCalls = state.calls.map(call => {
         const deadline = new Date(call.deadline);
-        const daysUntilDeadline = Math.ceil((deadline.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
-        
-        let status: FundingStatus = call.status;
-        if (daysUntilDeadline <= 0) {
-          status = 'closed';
-        } else if (daysUntilDeadline <= 7) {
-          status = 'closing_soon';
-        } else {
-          status = 'open';
-        }
-
-        if (status !== call.status) {
-          return { ...call, status };
+        if (deadline <= now && call.status !== 'closed') {
+          return { ...call, status: 'closed' as const };
         }
         return call;
       });
 
       if (JSON.stringify(updatedCalls) !== JSON.stringify(state.calls)) {
-        dispatch({ type: 'SET_CALLS', payload: updatedCalls });
+        dispatch({ 
+          type: 'SET_FUNDING_DATA', 
+          payload: { 
+            calls: updatedCalls,
+            pagination: state.pagination 
+          } 
+        });
       }
     };
 
@@ -123,17 +150,15 @@ export function FundingProvider({ children }: { children: React.ReactNode }) {
 
   // Filter calls based on current filters
   const filteredCalls = state.calls.filter(call => {
-    if (!call) return false; // Skip null or undefined calls
+    if (!call) return false;
     
-    const { type, status, featured, tags } = state.filters;
+    const { type, status, featured } = state.filters;
     
-    // Type-safe filtering using the FundingCall type definition
     const typeMatches = !type || call.type === type;
     const statusMatches = !status || call.status === status;
     const featuredMatches = featured === undefined || call.featured === featured;
-    const tagsMatch = !tags?.length || tags.some(tag => call.tags?.includes(tag));
     
-    return typeMatches && statusMatches && featuredMatches && tagsMatch;
+    return typeMatches && statusMatches && featuredMatches;
   });
 
   return (

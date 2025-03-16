@@ -8,8 +8,6 @@ import Testimonials from '../components/home/Testimonials';
 
 // Import assets
 import heroImage from '../assets/images/use-in-hero.png';
-import globeGif from '../assets/images/rotating-globe-connected-gif.gif';
-import wavePattern from '../assets/images/patterns/wave.svg';
 import howItWorksImage from '../assets/images/how-it-works.png';
 import partnershipImage from '../assets/images/partnership.png';
 
@@ -32,25 +30,185 @@ const Section = styled.section`
 `;
 
 const HeroSection = styled(Section)`
-  background: var(--gradient-primary);
+  background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)),
+              url(${heroImage}) no-repeat center center;
+  background-size: cover;
   color: white;
-  text-align: center;
+  min-height: calc(100vh - var(--header-height));
+  display: flex;
+  align-items: center;
+  padding: 0;
+  margin-top: var(--header-height);
 
-  &::after {
-    content: '';
-    position: absolute;
-    bottom: -50px;
-    left: 0;
-    right: 0;
-    height: 100px;
-    background: var(--background);
-    clip-path: polygon(0 0, 100% 50%, 100% 100%, 0% 100%);
+  @media (max-width: 768px) {
+    min-height: calc(100vh - var(--header-height));
+    padding: 2rem 0;
   }
 `;
 
-const Container = styled.div`
-  max-width: 1200px;
-  margin: 0 auto;
+const HeroContainer = styled.div`
+  width: 100%;
+  padding: 2rem;
+  z-index: 1;
+
+  @media (max-width: 768px) {
+    padding: 1rem;
+  }
+`;
+
+const HeroContent = styled.div`
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  gap: 4rem;
+
+  @media (max-width: 1024px) {
+    gap: 2rem;
+  }
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+    text-align: center;
+    gap: 2rem;
+  }
+`;
+
+const HeroLogo = styled.div`
+  order: 2;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  img {
+    max-width: 400px;
+    width: 100%;
+    height: auto;
+    filter: drop-shadow(0 0 20px rgba(255, 255, 255, 0.3));
+  }
+
+  @media (max-width: 1024px) {
+    img {
+      max-width: 350px;
+    }
+  }
+
+  @media (max-width: 768px) {
+    order: 1;
+    margin-bottom: 1rem;
+    img {
+      max-width: 280px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    img {
+      max-width: 220px;
+    }
+  }
+`;
+
+const HeroText = styled.div`
+  order: 1;
+  max-width: 600px;
+
+  @media (max-width: 768px) {
+    order: 2;
+    margin: 0 auto;
+    max-width: 100%;
+  }
+`;
+
+const Title = styled.h1`
+  font-size: 3.5rem;
+  font-weight: 800;
+  margin-bottom: 1.5rem;
+  color: white;
+  line-height: 1.2;
+
+  @media (max-width: 1024px) {
+    font-size: 3rem;
+  }
+
+  @media (max-width: 768px) {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+  }
+
+  @media (max-width: 480px) {
+    font-size: 2rem;
+  }
+`;
+
+const Subtitle = styled.p`
+  font-size: 1.25rem;
+  margin-bottom: 2rem;
+  line-height: 1.6;
+  opacity: 0.9;
+
+  @media (max-width: 768px) {
+    font-size: 1.1rem;
+    margin-bottom: 1.5rem;
+  }
+
+  @media (max-width: 480px) {
+    font-size: 1rem;
+  }
+`;
+
+const HeroButtons = styled.div`
+  display: flex;
+  gap: 1rem;
+
+  @media (max-width: 768px) {
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+`;
+
+const Button = styled.a`
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem 2rem;
+  border-radius: var(--border-radius);
+  font-weight: 600;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  font-size: 1.1rem;
+
+  @media (max-width: 768px) {
+    width: 100%;
+    padding: 0.875rem 1.5rem;
+    font-size: 1rem;
+  }
+`;
+
+const PrimaryButton = styled(Button)`
+  background: var(--color-primary);
+  color: white;
+  border: 2px solid var(--color-primary);
+
+  &:hover {
+    background: var(--color-primary-light);
+    border-color: var(--color-primary-light);
+    transform: translateY(-2px);
+    text-decoration: none;
+    color: white;
+  }
+`;
+
+const SecondaryButton = styled(Button)`
+  background: transparent;
+  color: white;
+  border: 2px solid white;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: translateY(-2px);
+    text-decoration: none;
+    color: white;
+  }
 `;
 
 const Grid = styled.div`
@@ -63,48 +221,9 @@ const Grid = styled.div`
   }
 `;
 
-const Title = styled.h1`
-  font-size: 3.5rem;
-  font-weight: 800;
-  margin-bottom: 1.5rem;
-  color: white;
-`;
-
-const Subtitle = styled.p`
-  font-size: 1.25rem;
-  max-width: 800px;
-  margin: 0 auto 3rem;
-  line-height: 1.6;
-  opacity: 0.9;
-`;
-
-const StatsGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 2rem;
-  margin-top: 3rem;
-`;
-
-const StatCard = styled(motion.div)`
-  background: rgba(255, 255, 255, 0.1);
-  padding: 1.5rem;
-  border-radius: 12px;
-  backdrop-filter: blur(5px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-`;
-
-const StatValue = styled.div`
-  font-size: 2.5rem;
-  font-weight: bold;
-  margin-bottom: 0.5rem;
-  background: linear-gradient(135deg, #ffffff 0%, rgba(255, 255, 255, 0.8) 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-`;
-
-const StatLabel = styled.div`
-  font-size: 1rem;
-  opacity: 0.9;
+const Container = styled.div`
+  max-width: 1200px;
+  margin: 0 auto;
 `;
 
 const Card = styled(motion.div)`
@@ -181,42 +300,6 @@ const SubTitle = styled.h3`
   margin-bottom: 2rem;
 `;
 
-const HeroGrid = styled(Grid)`
-  align-items: center;
-  margin-bottom: 2rem;
-`;
-
-const HeroImageContainer = styled.div`
-  position: relative;
-  
-  img.hero-main {
-    width: 100%;
-    border-radius: 20px;
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-  }
-
-  img.globe {
-    position: absolute;
-    bottom: -2rem;
-    right: -2rem;
-    width: 120px;
-    animation: float 6s ease-in-out infinite;
-  }
-
-  @keyframes float {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-20px); }
-  }
-`;
-
-const WavePattern = styled.img`
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  z-index: 1;
-`;
-
 const services = [
   { icon: grantSupportIcon, title: 'Grant Support', description: 'Expert guidance through the grant application process' },
   { icon: mentorshipIcon, title: 'Mentorship', description: 'One-on-one mentoring from experienced professionals' },
@@ -251,42 +334,39 @@ const partnerExpectations = [
 ];
 
 const Home: React.FC = () => {
-  const { grantStats, featuredGrants, featuredScholarships } = useGrants();
+  const { featuredGrants, featuredScholarships } = useGrants();
   const { ref: scrollRef, animation: scrollAnimation } = useScrollAnimation();
 
   return (
     <PageContainer>
       <HeroSection>
-        <Container>
-          <HeroGrid>
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6 }}
-            >
-              <Title>Unlock Global Grant Opportunities</Title>
-              <Subtitle>Your gateway to worldwide funding possibilities</Subtitle>
-              <StatsGrid>
-                {grantStats.map((stat, index) => (
-                  <StatCard
-                    key={index}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: index * 0.2 }}
-                  >
-                    <StatValue>{stat.value}</StatValue>
-                    <StatLabel>{stat.label}</StatLabel>
-                  </StatCard>
-                ))}
-              </StatsGrid>
-            </motion.div>
-            <HeroImageContainer>
-              <img src={heroImage} alt="Grant opportunities" className="hero-main" />
-              <img src={globeGif} alt="Global reach" className="globe" />
-            </HeroImageContainer>
-          </HeroGrid>
-        </Container>
-        <WavePattern src={wavePattern} alt="" />
+        <HeroContainer>
+          <HeroContent>
+            <HeroText>
+              <motion.div
+                initial={{ opacity: 0, x: -50 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.8, delay: 0.2 }}
+              >
+                <Title>Unlock Global Grant Opportunities</Title>
+                <Subtitle>Your gateway to worldwide funding possibilities</Subtitle>
+                <HeroButtons>
+                  <PrimaryButton href="/register">Get Started</PrimaryButton>
+                  <SecondaryButton href="/about">Learn More</SecondaryButton>
+                </HeroButtons>
+              </motion.div>
+            </HeroText>
+            <HeroLogo>
+              <motion.img
+                src={heroImage}
+                alt="Grant opportunities"
+                initial={{ opacity: 0, x: 50 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.8 }}
+              />
+            </HeroLogo>
+          </HeroContent>
+        </HeroContainer>
       </HeroSection>
 
       <Section ref={scrollRef}>
