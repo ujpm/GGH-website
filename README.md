@@ -1,161 +1,211 @@
 # Global Grants Hub
 
-A platform designed to empower civil society organizations, NGOs, entrepreneurs, and students by providing daily funding opportunities, resources, and support.
+A comprehensive platform designed to empower civil society organizations, NGOs, entrepreneurs, and students by providing daily funding opportunities, resources, and support for grant applications.
 
-## Features
+## 🌟 Features
 
-- Daily funding opportunity updates
-- Grant application support resources
-- Role-based content management
-- Interactive funding call details
-- Secure admin controls
-- MongoDB integration
-- TypeScript throughout
+- **User Authentication & Authorization**
+  - Secure login/register system with Google OAuth integration
+  - Role-based access control (Admin, User)
+  - Protected routes and content
 
-## Tech Stack
+- **Funding Opportunities**
+  - Daily updated funding calls
+  - Detailed grant information
+  - Search and filter capabilities
+  - Application guidance resources
+
+- **Content Management**
+  - Admin dashboard for content creation and management
+  - Rich text editor for content creation
+  - User management interface
+  - Profile management
+
+- **Technical Features**
+  - MongoDB integration for data persistence
+  - TypeScript implementation for type safety
+  - Responsive design for all devices
+  - Modern UI with animations
+
+## 🛠️ Tech Stack
 
 ### Frontend
-- React 18 with TypeScript
-- Vite as build tool
-- Styled Components
-- React Router DOM
-- React Query
-- Framer Motion
+- **Core**: React 18 with TypeScript
+- **Build Tool**: Vite
+- **Styling**: Styled Components, TailwindCSS
+- **Routing**: React Router DOM v6
+- **State Management**: React Query
+- **UI/UX**: Framer Motion
+- **Authentication**: @react-oauth/google
+- **HTTP Client**: Axios
+- **Form Handling**: React Hook Form
+- **Notifications**: React Hot Toast
 
 ### Backend
-- Node.js with TypeScript
-- Express.js
-- MongoDB with Mongoose
-- JWT Authentication
-- Role-based Authorization
+- **Runtime**: Node.js with TypeScript
+- **Framework**: Express.js
+- **Database**: MongoDB with Mongoose
+- **Authentication**: JWT, Google Auth Library
+- **File Upload**: Multer
+- **Security**: bcryptjs, CORS
+- **Validation**: Express Validator
 
-## Deployment Guide
+## 🚀 Getting Started
 
 ### Prerequisites
+- Node.js >= 18.0.0
+- MongoDB instance
+- Google OAuth credentials
 
-1. Create accounts on:
-   - Vercel (frontend deployment)
-   - Railway.app or Render (backend deployment)
-   - MongoDB Atlas (database)
+### Installation
 
-2. Install Vercel CLI:
+1. **Clone the repository**
    ```bash
-   npm i -g vercel
-   ```
-
-### Frontend Deployment (Vercel)
-
-1. Push your code to GitHub
-2. Connect your repository to Vercel
-3. Configure environment variables in Vercel dashboard:
-   ```
-   VITE_API_URL=your-backend-url
-   VITE_APP_ENV=production
-   ```
-4. Deploy using Vercel dashboard or CLI:
-   ```bash
-   vercel
-   ```
-
-### Backend Deployment (Railway/Render)
-
-1. Configure environment variables:
-   ```
-   NODE_ENV=production
-   PORT=5000
-   MONGODB_URI=your-mongodb-atlas-uri
-   JWT_SECRET=your-secure-jwt-secret
-   FRONTEND_URL=your-vercel-frontend-url
-   ```
-
-2. For Railway:
-   - Connect your GitHub repository
-   - Set environment variables
-   - Railway will automatically deploy
-
-3. For Render:
-   - Create a new Web Service
-   - Connect your repository
-   - Set build command: `npm install && npm run build`
-   - Set start command: `npm start`
-
-### Database Setup (MongoDB Atlas)
-
-1. Create a new cluster
-2. Set up database access:
-   - Create a database user
-   - Set up network access (IP whitelist)
-3. Get your connection string
-4. Add it to your backend environment variables
-
-## Development Setup
-
-1. Clone the repository:
-   ```bash
-   git clone <repository-url>
+   git clone https://github.com/ujpm/GGH-website.git
    cd GGH-website
    ```
 
-2. Install dependencies:
+2. **Frontend Setup**
    ```bash
-   # Install frontend dependencies
+   # Install dependencies
    npm install
 
-   # Install backend dependencies
+   # Create .env file
+   cp .env.example .env
+   # Add your environment variables
+   ```
+
+3. **Backend Setup**
+   ```bash
    cd backend
    npm install
+
+   # Create .env file
+   cp .env.example .env
+   # Add your environment variables
    ```
 
-3. Set up environment variables:
-   - Copy `.env.example` to `.env` in both root and backend directories
-   - Fill in the required values
+### Environment Variables
 
-4. Start development servers:
+#### Frontend (.env)
+```
+VITE_API_URL=your_backend_url
+VITE_GOOGLE_CLIENT_ID=your_google_client_id
+```
+
+#### Backend (.env)
+```
+PORT=8000
+MONGODB_URI=your_mongodb_uri
+JWT_SECRET=your_jwt_secret
+GOOGLE_CLIENT_ID=your_google_client_id
+```
+
+### Running the Application
+
+1. **Start Backend**
    ```bash
-   # Start frontend
-   npm run dev
-
-   # Start backend
    cd backend
-   npm run dev
+   npm run dev   # For development
+   # OR
+   npm run build && npm start   # For production
    ```
 
-## Production Build
+2. **Start Frontend**
+   ```bash
+   # In another terminal
+   npm run dev   # For development
+   # OR
+   npm run build && npm run preview   # For production
+   ```
 
-### Frontend
-```bash
-npm run build
+## 📦 Project Structure
+
+```
+global-grants-hub/
+├── src/
+│   ├── components/
+│   │   ├── auth/          # Authentication components
+│   │   ├── dashboard/     # Dashboard components
+│   │   └── layout/        # Layout components
+│   ├── context/           # React context providers
+│   ├── pages/             # Page components
+│   ├── styles/            # Global styles
+│   └── types/             # TypeScript type definitions
+├── backend/
+│   ├── src/
+│   │   ├── controllers/   # Route controllers
+│   │   ├── middleware/    # Custom middleware
+│   │   ├── models/        # Mongoose models
+│   │   ├── routes/        # API routes
+│   │   └── utils/         # Utility functions
+│   └── config/            # Backend configuration
+└── public/                # Static assets
 ```
 
-### Backend
-```bash
-cd backend
-npm run build
-```
+## 🔐 Security Features
 
-## Security Considerations
+- JWT-based authentication
+- Password hashing with bcrypt
+- CORS protection
+- Protected API endpoints
+- Role-based access control
+- Secure environment variable handling
 
-- All environment variables must be properly set in production
-- Enable rate limiting and CORS protection
-- Keep MongoDB Atlas access restricted
-- Regularly update dependencies
-- Monitor application logs
-- Set up proper error tracking
-- Enable SSL/TLS
+## 📱 Responsive Design
 
-## Monitoring and Maintenance
+The application is fully responsive and optimized for:
+- Desktop (1024px and above)
+- Tablet (768px to 1023px)
+- Mobile (below 768px)
 
-- Set up monitoring on Vercel/Railway dashboard
-- Monitor MongoDB Atlas metrics
-- Set up error tracking (e.g., Sentry)
-- Regular dependency updates
-- Database backups
+## 🚀 Production Deployment Guide
+
+### Building for Production
+
+1. **Build Frontend**
+   ```bash
+   # In the root directory
+   npm run build
+   ```
+   This will create a `dist` directory with optimized production files.
+
+2. **Build Backend**
+   ```bash
+   cd backend
+   npm run build
+   ```
+   This will create a `dist` directory with compiled TypeScript files.
+
+### Deployment Requirements
+
+1. **Server Requirements**
+   - Node.js >= 18.0.0
+   - MongoDB instance (can be local or cloud-hosted)
+   - Nginx or Apache for reverse proxy (recommended)
+   - SSL certificate for HTTPS
+
+2. **Configuration**
+   - Set up proper environment variables
+   - Configure MongoDB connection
+   - Set up proper CORS settings
+   - Configure reverse proxy
+   - Enable SSL/HTTPS
+
+
+
+### Monitoring and Maintenance
+
+- Set up application logging
+- Monitor server resources
+- Regular database backups
+- Regular security updates
 - Performance monitoring
 
-## Support
 
-For any issues or questions, please open an issue in the repository.
+## 👥 developed by JP
 
-## License
 
-This project is licensed under the MIT License.
+## 📞 Support
+
+For more enquiries, email me on[MY EMAIL](mailto:uwizeyimanajp2@gmail.com) or create an issue in the repository.

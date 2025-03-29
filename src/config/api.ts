@@ -17,34 +17,37 @@ export const API_URL = getApiUrl();
 export const API_ENDPOINTS = {
   // Auth endpoints
   auth: {
-    login: '/auth/login',
-    register: '/auth/register',
-    logout: '/auth/logout',
-    verify: '/auth/verify'
+    login: '/api/auth/login',
+    register: '/api/auth/register',
+    logout: '/api/auth/logout',
+    verify: '/api/auth/verify',
+    me: '/api/auth/me'
   },
   
   // Funding calls endpoints
   funding: {
-    list: '/funding',
-    create: '/funding',
-    update: (id: string) => `/funding/${id}`,
-    delete: (id: string) => `/funding/${id}`,
-    getById: (id: string) => `/funding/${id}`
+    list: '/api/funding',
+    create: '/api/funding',
+    update: (id: string) => `/api/funding/${id}`,
+    delete: (id: string) => `/api/funding/${id}`,
+    getById: (id: string) => `/api/funding/${id}`,
+    stats: '/api/funding/stats'
   },
   
-  // Content endpoints (for grants/scholarships/resources)
+  // Content endpoints
   content: {
-    list: '/content',
-    create: '/content',
-    update: (id: string) => `/content/${id}`,
-    delete: (id: string) => `/content/${id}`,
-    getByType: (type: string) => `/content/type/${type}`
+    list: '/api/content',
+    create: '/api/content',
+    update: (id: string) => `/api/content/${id}`,
+    delete: (id: string) => `/api/content/${id}`,
+    getByType: (type: string) => `/api/content/type/${type}`
   },
   
-  // Dashboard endpoints (admin only)
+  // Dashboard endpoints
   dashboard: {
-    overview: '/dashboard/overview',
-    stats: '/dashboard/stats',
-    manage: '/dashboard/manage'
+    overview: '/api/dashboard/overview',
+    users: '/api/dashboard/users',
+    stats: '/api/dashboard/stats',
+    manage: '/api/dashboard/manage'
   }
 };

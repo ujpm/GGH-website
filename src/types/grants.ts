@@ -1,4 +1,4 @@
-export type FundingType = 'grant' | 'scholarship';
+export type FundingType = 'grant' | 'scholarship' | 'resource';
 
 export type FundingStatus = 'open' | 'closed';
 
@@ -51,7 +51,7 @@ export interface FundingResponse {
   pagination: {
     total: number;
     page: number;
-    pages: number;
-    limit: number;
+    pageSize: number;
+    totalPages: number;
   };
 }

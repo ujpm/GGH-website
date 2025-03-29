@@ -5,6 +5,7 @@ import { FundingCall } from '../../types/grants';
 import FundingCallForm from '../../components/admin/FundingCallForm';
 import { toast } from 'react-hot-toast';
 import { format } from 'date-fns';
+import { API_URL, API_ENDPOINTS } from '../../config/api';
 
 const Container = styled.div`
   padding: 2rem;
@@ -53,36 +54,23 @@ const Table = styled.table`
 const Th = styled.th`
   padding: 1rem;
   text-align: left;
-  background: #f8f9fa;
-  color: #495057;
-  font-weight: 600;
-  border-bottom: 2px solid #dee2e6;
+  background: var(--color-primary);
+  color: white;
+  font-weight: 500;
 `;
 
 const Td = styled.td`
   padding: 1rem;
-  border-bottom: 1px solid #dee2e6;
-  color: #212529;
+  border-bottom: 1px solid #eee;
 `;
 
-const ActionButton = styled.button<{ variant: 'edit' | 'delete' }>`
+const ActionButton = styled(Button)`
   padding: 0.5rem 1rem;
-  border: none;
-  border-radius: 4px;
-  font-size: 0.9rem;
-  cursor: pointer;
-  transition: all 0.2s ease;
   margin-right: 0.5rem;
-  background-color: ${props => 
-    props.variant === 'edit' ? '#0d6efd' : '#dc3545'};
-  color: white;
-
-  &:hover {
-    opacity: 0.9;
-  }
+  font-size: 0.875rem;
 `;
 
-const Modal = styled.div`
+const FormOverlay = styled.div`
   position: fixed;
   top: 0;
   left: 0;
@@ -90,63 +78,28 @@ const Modal = styled.div`
   bottom: 0;
   background: rgba(0, 0, 0, 0.5);
   display: flex;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
   z-index: 1000;
 `;
 
-const ModalContent = styled.div`
+const FormContainer = styled.div`
   background: white;
   padding: 2rem;
   border-radius: 8px;
-  width: 90%;
-  max-width: 800px;
+  width: 100%;
+  max-width: 600px;
   max-height: 90vh;
   overflow-y: auto;
-  position: relative;
 `;
 
-const CloseButton = styled.button`
-  position: absolute;
-  top: 1rem;
-  right: 1rem;
-  background: none;
-  border: none;
-  font-size: 1.5rem;
-  cursor: pointer;
-  color: #666;
-
-  &:hover {
-    color: #333;
-  }
-`;
-
-const Status = styled.span<{ status: string }>`
-  background: ${props => {
-    switch (props.status) {
-      case 'open':
-        return '#E8F5E9';
-      case 'closing_soon':
-        return '#FFF3E0';
-      default:
-        return '#FFEBEE';
-    }
-  }};
-  color: ${props => {
-    switch (props.status) {
-      case 'open':
-        return '#388E3C';
-      case 'closing_soon':
-        return '#F57C00';
-      default:
-        return '#D32F2F';
-    }
-  }};
-  padding: 0.25rem 0.75rem;
-  border-radius: 999px;
-  font-size: 0.75rem;
-  font-weight: 500;
-  text-transform: capitalize;
+const LoadingSpinner = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 200px;
+  font-size: 1.2rem;
+  color: var(--color-primary);
 `;
 
 const ManageFunding: React.FC = () => {
@@ -166,14 +119,14 @@ const ManageFunding: React.FC = () => {
 
   const fetchFundingCalls = async () => {
     try {
-      const response = await fetch('/api/funding-calls', {
+      const response = await fetch(`${API_URL}${API_ENDPOINTS.funding.list}`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
       });
       if (response.ok) {
         const data = await response.json();
-        setFundingCalls(data);
+        setFundingCalls(data.data.calls); 
       } else {
         toast.error('Failed to fetch funding calls');
       }
@@ -187,7 +140,7 @@ const ManageFunding: React.FC = () => {
 
   const createFundingCall = async (data: Omit<FundingCall, '_id' | 'createdAt' | 'updatedAt'>) => {
     try {
-      const response = await fetch('/api/funding-calls', {
+      const response = await fetch(`${API_URL}${API_ENDPOINTS.funding.create}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -197,7 +150,8 @@ const ManageFunding: React.FC = () => {
       });
 
       if (response.ok) {
-        const newCall = await response.json();
+        const result = await response.json();
+        const newCall = result.data;
         setFundingCalls(prev => [...prev, newCall]);
         setShowForm(false);
         toast.success('Funding call created successfully');
@@ -214,7 +168,7 @@ const ManageFunding: React.FC = () => {
 
   const updateFundingCall = async (id: string, data: Omit<FundingCall, '_id' | 'createdAt' | 'updatedAt'>) => {
     try {
-      const response = await fetch(`/api/funding-calls/${id}`, {
+      const response = await fetch(`${API_URL}${API_ENDPOINTS.funding.update(id)}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -224,7 +178,8 @@ const ManageFunding: React.FC = () => {
       });
 
       if (response.ok) {
-        const updatedCall = await response.json();
+        const result = await response.json();
+        const updatedCall = result.data;
         setFundingCalls(prev =>
           prev.map(call => call._id === id ? updatedCall : call)
         );
@@ -248,7 +203,7 @@ const ManageFunding: React.FC = () => {
     }
 
     try {
-      const response = await fetch(`/api/funding-calls/${id}`, {
+      const response = await fetch(`${API_URL}${API_ENDPOINTS.funding.delete(id)}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
@@ -272,26 +227,31 @@ const ManageFunding: React.FC = () => {
     setShowForm(true);
   };
 
-  const handleCreate = async (data: Omit<FundingCall, '_id' | 'createdAt' | 'updatedAt'>) => {
-    return await createFundingCall(data);
-  };
-
-  const handleUpdate = async (data: Omit<FundingCall, '_id' | 'createdAt' | 'updatedAt'>) => {
-    if (editingCall) {
-      return await updateFundingCall(editingCall._id, data);
+  const handleSubmit = async (data: Omit<FundingCall, '_id' | 'createdAt' | 'updatedAt'>) => {
+    try {
+      if (!editingCall) {
+        await createFundingCall(data);
+      } else {
+        if (!editingCall._id) {
+          throw new Error('No funding call selected for editing');
+        }
+        await updateFundingCall(editingCall._id, data);
+      }
+    } catch (error) {
+      // Error is already handled in the respective functions
+      return;
     }
-    throw new Error('No funding call selected for editing');
   };
 
   if (loading) {
-    return <div>Loading...</div>;
+    return <LoadingSpinner>Loading...</LoadingSpinner>;
   }
 
   return (
     <Container>
       <Header>
         <Title>Manage Funding Calls</Title>
-        <Button onClick={() => setShowForm(true)}>Create New</Button>
+        <Button onClick={() => setShowForm(true)}>Add New</Button>
       </Header>
 
       <Table>
@@ -299,9 +259,8 @@ const ManageFunding: React.FC = () => {
           <tr>
             <Th>Title</Th>
             <Th>Type</Th>
-            <Th>Organization</Th>
-            <Th>Deadline</Th>
             <Th>Status</Th>
+            <Th>Deadline</Th>
             <Th>Actions</Th>
           </tr>
         </thead>
@@ -309,15 +268,12 @@ const ManageFunding: React.FC = () => {
           {fundingCalls.map(call => (
             <tr key={call._id}>
               <Td>{call.title}</Td>
-              <Td style={{ textTransform: 'capitalize' }}>{call.type}</Td>
-              <Td>{call.organization}</Td>
+              <Td>{call.type}</Td>
+              <Td>{call.status}</Td>
               <Td>{format(new Date(call.deadline), 'MMM d, yyyy')}</Td>
-              <Td><Status status={call.status}>{call.status}</Status></Td>
               <Td>
-                <ActionButton variant="edit" onClick={() => handleEdit(call)}>
-                  Edit
-                </ActionButton>
-                <ActionButton variant="delete" onClick={() => handleDelete(call._id)}>
+                <ActionButton onClick={() => handleEdit(call)}>Edit</ActionButton>
+                <ActionButton variant="secondary" onClick={() => handleDelete(call._id)}>
                   Delete
                 </ActionButton>
               </Td>
@@ -327,22 +283,18 @@ const ManageFunding: React.FC = () => {
       </Table>
 
       {showForm && (
-        <Modal>
-          <ModalContent>
-            <CloseButton onClick={() => {
-              setShowForm(false);
-              setEditingCall(null);
-            }}>×</CloseButton>
+        <FormOverlay>
+          <FormContainer>
             <FundingCallForm
-              initialData={editingCall || undefined}
-              onSubmit={editingCall ? handleUpdate : handleCreate}
+              onSubmit={handleSubmit}
               onCancel={() => {
                 setShowForm(false);
                 setEditingCall(null);
               }}
+              initialData={editingCall}
             />
-          </ModalContent>
-        </Modal>
+          </FormContainer>
+        </FormOverlay>
       )}
     </Container>
   );
