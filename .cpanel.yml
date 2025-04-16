@@ -1,0 +1,11 @@
+---
+deployment:
+  tasks:
+    - export DEPLOYPATH=/home/$USER/public_html
+    - echo "Starting deployment..."
+    - mkdir -p $DEPLOYPATH  # Ensure the deployment path exists
+    - rsync -av --exclude='.git/' --exclude='.cpanel.yml' ./ $DEPLOYPATH  # Use rsync for efficient file transfer
+    - echo "Setting correct permissions..."
+    - find $DEPLOYPATH -type d -exec chmod 755 {} \;  # Set directory permissions
+    - find $DEPLOYPATH -type f -exec chmod 644 {} \;  # Set file permissions
+    - echo "Deployment completed successfully."
